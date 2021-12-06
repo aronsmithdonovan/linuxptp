@@ -17,25 +17,41 @@
  * with this program; if not, write to the Free Software Foundation, Inc.,
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
-#include <limits.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <unistd.h>
 
-#include "clock.h"
-#include "config.h"
-#include "ntpshm.h"
-#include "pi.h"
-#include "print.h"
-#include "raw.h"
-#include "sk.h"
-#include "transport.h"
-#include "udp6.h"
-#include "uds.h"
-#include "util.h"
-#include "version.h"
+/* 
+ * %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+ *  INCLUDE STATEMENTS
+ * %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+*/
+	#include <limits.h>
+	#include <stdio.h>
+	#include <stdlib.h>
+	#include <string.h>
+	#include <unistd.h>
 
+	#include "clock.h"
+	#include "config.h"
+		// config_create
+		// config_long_options
+		// config_parse_option
+		// config_set_int
+	#include "ntpshm.h"
+	#include "pi.h"
+	#include "print.h"
+	#include "raw.h"
+	#include "sk.h"
+	#include "transport.h"
+	#include "udp6.h"
+	#include "uds.h"
+	#include "util.h"
+	#include "version.h"
+
+
+/* 
+ * %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+ *  usage
+ * %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+*/
 static void usage(char *progname)
 {
 	fprintf(stderr,
@@ -68,8 +84,14 @@ static void usage(char *progname)
 		progname);
 }
 
+/* 
+ * %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+ *  main
+ * %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+*/
 int main(int argc, char *argv[])
 {
+	// initializations
 	char *config = NULL, *req_phc = NULL, *progname;
 	enum clock_type type = CLOCK_TYPE_ORDINARY;
 	int c, err = -1, index, print_level;
@@ -77,100 +99,151 @@ int main(int argc, char *argv[])
 	struct option *opts;
 	struct config *cfg;
 
+	// ???
+	// TODO: what does this mean?
 	if (handle_term_signals())
 		return -1;
 
+	// initialize a config struct
 	cfg = config_create();
 	if (!cfg) {
 		return -1;
 	}
+
+	// get opts from cfg
 	opts = config_long_options(cfg);
 
-	/* Process the command line arguments. */
+	// processing command line arguments
 	progname = strrchr(argv[0], '/');
 	progname = progname ? 1+progname : argv[0];
 	while (EOF != (c = getopt_long(argc, argv, "AEP246HSLf:i:p:sl:mqvh",
 				       opts, &index))) {
 		switch (c) {
+
+		// 0 - ???
+		// TODO: what does this mean?
 		case 0:
 			if (config_parse_option(cfg, opts[index].name, optarg))
 				goto out;
 			break;
+		
+		// A - automatically select delay measurement mechanism
 		case 'A':
 			if (config_set_int(cfg, "delay_mechanism", DM_AUTO))
 				goto out;
 			break;
+
+		// E - select the end-to-end delay measurement mechanism
 		case 'E':
 			if (config_set_int(cfg, "delay_mechanism", DM_E2E))
 				goto out;
 			break;
+
+		// P - select the peer-to-peer delay measurement mechanism
 		case 'P':
 			if (config_set_int(cfg, "delay_mechanism", DM_P2P))
 				goto out;
 			break;
+		
+		// 2 - select transport over Ethernet (standard IEEE 802.3)
 		case '2':
 			if (config_set_int(cfg, "network_transport",
 					    TRANS_IEEE_802_3))
 				goto out;
 			break;
+		
+		// 4 - select transport over IPv4-based UDP
 		case '4':
 			if (config_set_int(cfg, "network_transport",
 					    TRANS_UDP_IPV4))
 				goto out;
 			break;
+
+		// 6 - select transport over IPv6-based UDP
 		case '6':
 			if (config_set_int(cfg, "network_transport",
 					    TRANS_UDP_IPV6))
 				goto out;
 			break;
+		
+		// H - select hardware timestamping
 		case 'H':
 			if (config_set_int(cfg, "time_stamping", TS_HARDWARE))
 				goto out;
 			break;
+
+		// S - select software timestamping
 		case 'S':
 			if (config_set_int(cfg, "time_stamping", TS_SOFTWARE))
 				goto out;
 			break;
+
+		// L - select legacy hardware timestamping
 		case 'L':
 			if (config_set_int(cfg, "time_stamping", TS_LEGACY_HW))
 				goto out;
 			break;
+		
+		// f - specify a configuration file
 		case 'f':
 			config = optarg;
 			break;
+
+		// i - specify a PTP port [REQUIRED]
 		case 'i':
 			if (!config_create_interface(optarg, cfg))
 				goto out;
 			break;
+
+		// p - specify which PHC device should be used (with hardware timestamping only)
 		case 'p':
 			req_phc = optarg;
 			break;
+
+		// s - enable slaveOnly mode
+		// TODO: what does this mean?
 		case 's':
 			if (config_set_int(cfg, "slaveOnly", 1)) {
 				goto out;
 			}
 			break;
+
+		// l - specify the maximum syslog level of messages that should be printed or sent to the system logger (default 6)
 		case 'l':
 			if (get_arg_val_i(c, optarg, &print_level,
 					  PRINT_LEVEL_MIN, PRINT_LEVEL_MAX))
 				goto out;
 			config_set_int(cfg, "logging_level", print_level);
 			break;
+
+		// m - enable verbose messages
 		case 'm':
 			config_set_int(cfg, "verbose", 1);
 			break;
+
+		// q - disable messages to the system logger
 		case 'q':
 			config_set_int(cfg, "use_syslog", 0);
 			break;
+
+		// v - print messages to the standard output
+		// TODO: what does this mean?
 		case 'v':
 			version_show(stdout);
 			return 0;
+
+		// h - display a help message 
 		case 'h':
 			usage(progname);
 			return 0;
+
+		// ? - go to out statement (same as default)
+		// TODO: what does this mean?
 		case '?':
 			usage(progname);
 			goto out;
+
+		// default - go to out statement
 		default:
 			usage(progname);
 			goto out;
