@@ -105,6 +105,7 @@ int (*clock_dscmp(struct clock *c))(struct dataset *a, struct dataset *b);
  */
 int clock_required_modes(struct clock *c);
 
+///////////////////////////////////////////////////////////////////////////////////////////////////////////// clock_create used in ptp4l.c
 /**
  * Create a clock instance. There can only be one clock in any system,
  * so subsequent calls will destroy the previous clock instance.
@@ -271,6 +272,7 @@ double clock_get_nrr(struct clock *c);
  */
 void clock_set_sde(struct clock *c, int sde);
 
+///////////////////////////////////////////////////////////////////////////////////////////////////////////// clock_poll used in ptp4l.c
 /**
  * Poll for events and dispatch them.
  * @param c A pointer to a clock instance obtained with clock_create().

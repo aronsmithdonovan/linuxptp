@@ -332,6 +332,7 @@ int get_arg_val_ui(int op, const char *optarg, unsigned int *val,
 int get_arg_val_d(int op, const char *optarg, double *val,
 		  double min, double max);
 
+///////////////////////////////////////////////////////////////////////////////////////////////////////////// handle_term_signals used in ptp4l.c
 /**
  * Setup a handler for terminating signals (SIGINT, SIGQUIT, SIGTERM).
  *

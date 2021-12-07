@@ -47,12 +47,14 @@ struct config {
 	STAILQ_HEAD(ucmtab_head, unicast_master_table) unicast_master_tables;
 };
 
+///////////////////////////////////////////////////////////////////////////////////////////////////////////// config_read used in ptp4l.c
 int config_read(const char *name, struct config *cfg);
 struct interface *config_create_interface(const char *name, struct config *cfg);
 void config_destroy(struct config *cfg);
 
 /* New, hash table based methods: */
 
+///////////////////////////////////////////////////////////////////////////////////////////////////////////// config_create used in ptp4l.c
 struct config *config_create(void);
 
 double config_get_double(struct config *cfg, const char *section,
@@ -66,11 +68,13 @@ char *config_get_string(struct config *cfg, const char *section,
 
 int config_harmonize_onestep(struct config *cfg);
 
+///////////////////////////////////////////////////////////////////////////////////////////////////////////// config_long_options used in ptp4l.c
 static inline struct option *config_long_options(struct config *cfg)
 {
 	return cfg->opts;
 }
 
+///////////////////////////////////////////////////////////////////////////////////////////////////////////// config_parse_option used in ptp4l.c
 int config_parse_option(struct config *cfg, const char *opt, const char *val);
 
 int config_set_double(struct config *cfg, const char *option, double val);
@@ -78,6 +82,7 @@ int config_set_double(struct config *cfg, const char *option, double val);
 int config_set_section_int(struct config *cfg, const char *section,
 			   const char *option, int val);
 
+///////////////////////////////////////////////////////////////////////////////////////////////////////////// config_set_int used in ptp4l.c
 static inline int config_set_int(struct config *cfg,
 				 const char *option, int val)
 {
