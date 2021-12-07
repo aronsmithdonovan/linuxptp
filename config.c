@@ -735,6 +735,7 @@ static struct option *config_alloc_longopts(void)
 	return opts;
 }
 
+///////////////////////////////////////////////////////////////////////////////////////////////////////////// config_read used in ptp4l.c
 int config_read(const char *name, struct config *cfg)
 {
 	enum config_section current_section = UNKNOWN_SECTION;
@@ -865,6 +866,7 @@ struct interface *config_create_interface(const char *name, struct config *cfg)
 	return iface;
 }
 
+///////////////////////////////////////////////////////////////////////////////////////////////////////////// config_create used in ptp4l.c
 struct config *config_create(void)
 {
 	char buf[CONFIG_LABEL_SIZE + 8];
@@ -1032,6 +1034,7 @@ int config_harmonize_onestep(struct config *cfg)
 	return 0;
 }
 
+///////////////////////////////////////////////////////////////////////////////////////////////////////////// config_parse_option used in ptp4l.c
 int config_parse_option(struct config *cfg, const char *opt, const char *val)
 {
 	enum parser_result result;

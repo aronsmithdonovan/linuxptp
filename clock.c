@@ -883,6 +883,7 @@ int clock_required_modes(struct clock *c)
 	return required_modes;
 }
 
+///////////////////////////////////////////////////////////////////////////////////////////////////////////// clock_create used in ptp4l.c
 struct clock *clock_create(enum clock_type type, struct config *config,
 			   const char *phc_device)
 {
@@ -1545,6 +1546,7 @@ void clock_set_sde(struct clock *c, int sde)
 	c->sde = sde;
 }
 
+///////////////////////////////////////////////////////////////////////////////////////////////////////////// clock_poll used in ptp4l.c
 int clock_poll(struct clock *c)
 {
 	int cnt, i;

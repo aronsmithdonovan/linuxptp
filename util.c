@@ -568,6 +568,7 @@ static void handle_int_quit_term(int s)
 	running = 0;
 }
 
+///////////////////////////////////////////////////////////////////////////////////////////////////////////// handle_term_signals used in ptp4l.c
 int handle_term_signals(void)
 {
 	if (SIG_ERR == signal(SIGINT, handle_int_quit_term)) {
