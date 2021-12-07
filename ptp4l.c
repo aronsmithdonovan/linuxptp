@@ -30,20 +30,30 @@
 	#include <unistd.h>
 
 	#include "clock.h"
+		// clock_create
+		// clock_poll
 	#include "config.h"
 		// config_create
 		// config_long_options
 		// config_parse_option
 		// config_set_int
+		// config_read
+		// config_destroy
 	#include "ntpshm.h"
 	#include "pi.h"
 	#include "print.h"
+		// print_set_progname
+		// print_set_tag
+		// print_set_verbose
+		// print_set_syslog
+		// print_set_level
 	#include "raw.h"
 	#include "sk.h"
 	#include "transport.h"
 	#include "udp6.h"
 	#include "uds.h"
 	#include "util.h"
+		// handle_term_signals
 	#include "version.h"
 
 
@@ -99,7 +109,7 @@ int main(int argc, char *argv[])
 	struct option *opts;
 	struct config *cfg;
 
-	// ???
+	// sets up a handler for terminating signals
 	// TODO: what does this mean?
 	if (handle_term_signals())
 		return -1;
@@ -232,51 +242,61 @@ int main(int argc, char *argv[])
 			version_show(stdout);
 			return 0;
 
-		// h - display a help message 
+		// h - display usage message 
 		case 'h':
 			usage(progname);
 			return 0;
 
-		// ? - go to out statement (same as default)
+		// ? - display usage message and go to out statement (same as default)
 		// TODO: what does this mean?
 		case '?':
 			usage(progname);
 			goto out;
 
-		// default - go to out statement
+		// default - display usage message and go to out statement
 		default:
 			usage(progname);
 			goto out;
 		}
 	}
 
+	// ???
+	// TODO: what does this mean?
 	if (config && (c = config_read(config, cfg))) {
 		return c;
 	}
 
+	// ???
+	// TODO: what does this mean?
 	print_set_progname(progname);
 	print_set_tag(config_get_string(cfg, NULL, "message_tag"));
 	print_set_verbose(config_get_int(cfg, NULL, "verbose"));
 	print_set_syslog(config_get_int(cfg, NULL, "use_syslog"));
 	print_set_level(config_get_int(cfg, NULL, "logging_level"));
 
+	// ???
+	// TODO: what does this mean?
 	assume_two_step = config_get_int(cfg, NULL, "assume_two_step");
 	sk_check_fupsync = config_get_int(cfg, NULL, "check_fup_sync");
 	sk_tx_timeout = config_get_int(cfg, NULL, "tx_timestamp_timeout");
 	sk_hwts_filter_mode = config_get_int(cfg, NULL, "hwts_filter");
 
+	// if clock_servo == CLOCK_SERVO_NTPSHM, set kernel_leap and sanity_freq_limit to 0
 	if (config_get_int(cfg, NULL, "clock_servo") == CLOCK_SERVO_NTPSHM) {
 		config_set_int(cfg, "kernel_leap", 0);
 		config_set_int(cfg, "sanity_freq_limit", 0);
 	}
 
+	// check if an interface is specified; if not, display usage message and go to out statement
 	if (STAILQ_EMPTY(&cfg->interfaces)) {
 		fprintf(stderr, "no interface specified\n");
 		usage(progname);
 		goto out;
 	}
 
+	// get clock_type
 	type = config_get_int(cfg, NULL, "clock_type");
+	// check that minimum requirements for clock type are fulfilled
 	switch (type) {
 	case CLOCK_TYPE_ORDINARY:
 		if (cfg->n_interfaces > 1) {
@@ -313,7 +333,10 @@ int main(int argc, char *argv[])
 		goto out;
 	}
 
+	// create a clock instance
+	// note: there can only be one clock in any system, so subsequent calls will destroy the previous instance
 	clock = clock_create(type, cfg, req_phc);
+	// if fail to create a clock, go to out statement
 	if (!clock) {
 		fprintf(stderr, "failed to create a clock\n");
 		goto out;
@@ -322,12 +345,20 @@ int main(int argc, char *argv[])
 	err = 0;
 
 	while (is_running()) {
+		// poll for events and dispatch them (zero on success, non-zero otherwise)
 		if (clock_poll(clock))
 			break;
 	}
+
+// out statement
 out:
+	// if clock, destroy it
 	if (clock)
 		clock_destroy(clock);
+
+	// destroy config object
 	config_destroy(cfg);
+	
+	// return error
 	return err;
 }
