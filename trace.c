@@ -13,7 +13,7 @@
 static FILE *fp_trace;
 
 // CONSTRUCTOR
-// executed before main()
+// executed before program start
 //// opens the trace file
 void
 __attribute__ ((constructor))
