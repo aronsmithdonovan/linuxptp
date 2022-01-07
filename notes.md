@@ -6,5 +6,20 @@
  * cloned the repo into WSL
  * opened the repo in VSC with `$ code .` command
 
-## 
- * 
+## PTP4L
+ * running ptp4l.c on a device configures it as a PTP interface
+ * the following output comes from initializing the WSL system:
+
+> aronsmithdonovan@ARON-LAPTOP:~/linuxptp$ sudo ./ptp4l -i eth0 -m -S\
+> [sudo] password for aronsmithdonovan:\
+> ptp4l[5520.464]: port 1: INITIALIZING to LISTENING on INIT_COMPLETE\
+> ptp4l[5520.464]: port 0: INITIALIZING to LISTENING on INIT_COMPLETE\
+> ptp4l[5527.602]: port 1: LISTENING to MASTER on ANNOUNCE_RECEIPT_TIMEOUT_EXPIRES\
+> ptp4l[5527.602]: selected local clock 00155d.fffe.894958 as best master\
+> ptp4l[5527.603]: port 1: assuming the grand master role
+
+## CHANGING THE MESSAGE CONSTRUCTION
+ * files `transport.h`, `transport.c`, `msg.h`, and `msg.c` appear to be responsible for constructing the PTP messages
+ * goal: modify these files s.t. it is possible to implement covert channels
+ * `struct ptp_header` and `struct ptp_message` declarations are in `msg.h`
+ * `sync_msg`, `delay_req_message`, and `delay_resp_msg`
