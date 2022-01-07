@@ -97,7 +97,7 @@ struct ptp_header {
 	Octet               flagField[2];
 	Integer64           correction;
 	UInteger32          reserved2;
-	struct PortIdentity sourcePortIdentity;
+	struct PortIdentity sourcePortIdentity;  // defined in ddt.h
 	UInteger16          sequenceId;
 	UInteger8           control;
 	Integer8            logMessageInterval;

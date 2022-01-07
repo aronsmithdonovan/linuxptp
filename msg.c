@@ -78,6 +78,8 @@ static void announce_post_recv(struct announce_msg *m)
 	m->stepsRemoved = ntohs(m->stepsRemoved);
 }
 
+///////////////////////////////////////////////////////////////////////////////////////////////////////////// hdr_post_recv
+///////////////////////////////////////////////////////////////////////////////////////////////////////////// uses ptp_header
 static int hdr_post_recv(struct ptp_header *m)
 {
 	if ((m->ver & VERSION_MASK) != VERSION)
@@ -89,12 +91,14 @@ static int hdr_post_recv(struct ptp_header *m)
 	return 0;
 }
 
+///////////////////////////////////////////////////////////////////////////////////////////////////////////// hdr_pre_send
+///////////////////////////////////////////////////////////////////////////////////////////////////////////// uses ptp_header
 static int hdr_pre_send(struct ptp_header *m)
 {
-	m->messageLength = htons(m->messageLength);
-	m->correction = host2net64(m->correction);
-	m->sourcePortIdentity.portNumber = htons(m->sourcePortIdentity.portNumber);
-	m->sequenceId = htons(m->sequenceId);
+	m->messageLength = htons(m->messageLength);  // converts UInteger16 messageLength from host CPU byte order to network byte order
+	m->correction = host2net64(m->correction);  // converts Integer64 correction from host CPU byte order to big endian byte order
+	m->sourcePortIdentity.portNumber = htons(m->sourcePortIdentity.portNumber);  // converts UInteger16 sourcePortIdentity.portNumber from host CPU byte order to network byte order
+	m->sequenceId = htons(m->sequenceId);  // converts UInteger16 sequenceId from from host CPU byte order to network byte order
 	return 0;
 }
 
@@ -337,6 +341,8 @@ void msg_get(struct ptp_message *m)
 	m->refcnt++;
 }
 
+///////////////////////////////////////////////////////////////////////////////////////////////////////////// msg_post_recv
+///////////////////////////////////////////////////////////////////////////////////////////////////////////// uses hdr_post_recv
 int msg_post_recv(struct ptp_message *m, int cnt)
 {
 	int pdulen, type, err;
@@ -431,6 +437,8 @@ int msg_post_recv(struct ptp_message *m, int cnt)
 	return 0;
 }
 
+///////////////////////////////////////////////////////////////////////////////////////////////////////////// msg_pre_send
+///////////////////////////////////////////////////////////////////////////////////////////////////////////// uses hdr_pre_send
 int msg_pre_send(struct ptp_message *m)
 {
 	int type;
