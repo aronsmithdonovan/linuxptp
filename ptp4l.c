@@ -228,6 +228,10 @@ int main(int argc, char *argv[])
 
 		// m - enable verbose messages
 		case 'm':
+			
+			// DEBUG
+			printf("\n\nDEBUG: ptp4l.main\n\n");
+			
 			config_set_int(cfg, "verbose", 1);
 			break;
 
@@ -352,9 +356,6 @@ int main(int argc, char *argv[])
 
 // out statement
 out:
-	
-	// DEBUG
-	printf("DEBUG: ptp4l.out\n");
 
 	// if clock, destroy it
 	if (clock)
