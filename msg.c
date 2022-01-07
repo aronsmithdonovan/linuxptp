@@ -254,6 +254,7 @@ static void timestamp_pre_send(struct Timestamp *ts)
 
 /* public methods */
 
+///////////////////////////////////////////////////////////////////////////////////////////////////////////// msg_allocate
 struct ptp_message *msg_allocate(void)
 {
 	struct message_storage *s;
@@ -280,6 +281,7 @@ struct ptp_message *msg_allocate(void)
 	return m;
 }
 
+///////////////////////////////////////////////////////////////////////////////////////////////////////////// msg_cleanup
 void msg_cleanup(void)
 {
 	struct message_storage *s;

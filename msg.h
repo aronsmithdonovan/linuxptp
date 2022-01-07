@@ -87,6 +87,7 @@ enum controlField {
 	CTL_OTHER,
 };
 
+///////////////////////////////////////////////////////////////////////////////////////////////////////////// ptp_header
 struct ptp_header {
 	uint8_t             tsmt; /* transportSpecific | messageType */
 	uint8_t             ver;  /* reserved          | versionPTP  */
@@ -116,11 +117,13 @@ struct announce_msg {
 	uint8_t              suffix[0];
 } PACKED;
 
+///////////////////////////////////////////////////////////////////////////////////////////////////////////// sync_msg
 struct sync_msg {
 	struct ptp_header   hdr;
 	struct Timestamp    originTimestamp;
 } PACKED;
 
+///////////////////////////////////////////////////////////////////////////////////////////////////////////// delay_req_message
 struct delay_req_msg {
 	struct ptp_header   hdr;
 	struct Timestamp    originTimestamp;
@@ -133,6 +136,7 @@ struct follow_up_msg {
 	uint8_t             suffix[0];
 } PACKED;
 
+///////////////////////////////////////////////////////////////////////////////////////////////////////////// delay_resp_msg
 struct delay_resp_msg {
 	struct ptp_header   hdr;
 	struct Timestamp    receiveTimestamp;
@@ -179,6 +183,7 @@ struct message_data {
 	uint8_t buffer[1500];
 } PACKED;
 
+///////////////////////////////////////////////////////////////////////////////////////////////////////////// ptp_message
 struct ptp_message {
 	union {
 		struct ptp_header          header;
@@ -311,6 +316,7 @@ static inline int msg_type(const struct ptp_message *m)
 	return m->header.tsmt & 0x0f;
 }
 
+///////////////////////////////////////////////////////////////////////////////////////////////////////////// msg_allocate
 /**
  * Allocate a new message instance.
  *
@@ -322,6 +328,7 @@ static inline int msg_type(const struct ptp_message *m)
  */
 struct ptp_message *msg_allocate(void);
 
+///////////////////////////////////////////////////////////////////////////////////////////////////////////// msg_cleanup
 /**
  * Release all of the memory in the message cache.
  */
