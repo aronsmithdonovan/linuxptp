@@ -102,7 +102,7 @@ static void usage(char *progname)
 int main(int argc, char *argv[])
 {
 	// DEBUG
-	printf("DEBUG: ptp4l.main\n");
+	pr_info("DEBUG: ptp4l.main\n");
 
 	// initializations
 	char *config = NULL, *req_phc = NULL, *progname;
