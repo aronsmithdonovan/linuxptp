@@ -102,8 +102,8 @@ static void usage(char *progname)
 int main(int argc, char *argv[])
 {
 	// DEBUG
-	printf("DEBUG: ptp4l.main");
-	
+	printf("DEBUG: ptp4l.main\n");
+
 	// initializations
 	char *config = NULL, *req_phc = NULL, *progname;
 	enum clock_type type = CLOCK_TYPE_ORDINARY;
