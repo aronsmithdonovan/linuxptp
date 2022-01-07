@@ -82,6 +82,9 @@ static void announce_post_recv(struct announce_msg *m)
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////// uses ptp_header
 static int hdr_post_recv(struct ptp_header *m)
 {
+	// DEBUG
+	printf("DEBUG: hdr_post_recv");
+
 	if ((m->ver & VERSION_MASK) != VERSION)
 		return -EPROTO;
 	m->messageLength = ntohs(m->messageLength);
@@ -95,6 +98,9 @@ static int hdr_post_recv(struct ptp_header *m)
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////// uses ptp_header
 static int hdr_pre_send(struct ptp_header *m)
 {
+	// DEBUG
+	printf("DEBUG: hdr_pre_send");
+
 	m->messageLength = htons(m->messageLength);  // converts UInteger16 messageLength from host CPU byte order to network byte order
 	m->correction = host2net64(m->correction);  // converts Integer64 correction from host CPU byte order to big endian byte order
 	m->sourcePortIdentity.portNumber = htons(m->sourcePortIdentity.portNumber);  // converts UInteger16 sourcePortIdentity.portNumber from host CPU byte order to network byte order
@@ -345,6 +351,9 @@ void msg_get(struct ptp_message *m)
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////// uses hdr_post_recv
 int msg_post_recv(struct ptp_message *m, int cnt)
 {
+	// DEBUG
+	printf("DEBUG: msg_post_recv");
+
 	int pdulen, type, err;
 
 	if (cnt < sizeof(struct ptp_header))
@@ -441,6 +450,9 @@ int msg_post_recv(struct ptp_message *m, int cnt)
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////// uses hdr_pre_send
 int msg_pre_send(struct ptp_message *m)
 {
+	// DEBUG
+	printf("DEBUG: msg_pre_send");
+
 	int type;
 
 	if (hdr_pre_send(&m->header))

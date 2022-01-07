@@ -1943,6 +1943,9 @@ struct dataset *port_best_foreign(struct port *port)
  */
 int process_announce(struct port *p, struct ptp_message *m)
 {
+	// DEBUG
+	printf("DEBUG: process_announce");
+
 	int result = 0;
 
 	if (m->announce.stepsRemoved >= clock_max_steps_removed(p->clock)) {
@@ -1973,6 +1976,9 @@ int process_announce(struct port *p, struct ptp_message *m)
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////// uses ptp_message->header
 static int process_delay_req(struct port *p, struct ptp_message *m)
 {
+	// DEBUG
+	printf("DEBUG: process_delay_req");
+
 	int err, nsm, saved_seqnum_sync;
 	struct ptp_message *msg;
 
@@ -2038,6 +2044,9 @@ out:
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////// uses ptp_message->header
 void process_delay_resp(struct port *p, struct ptp_message *m)
 {
+	// DEBUG
+	printf("DEBUG: process_delay_resp");
+
 	struct delay_resp_msg *rsp = &m->delay_resp;
 	struct ptp_message *req;
 	tmv_t c3, t3, t4, t4c;
@@ -2096,6 +2105,9 @@ void process_delay_resp(struct port *p, struct ptp_message *m)
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////// uses ptp_message->header
 void process_follow_up(struct port *p, struct ptp_message *m)
 {
+	// DEBUG
+	printf("DEBUG: process_follow_up");
+
 	enum syfu_event event;
 	switch (p->state) {
 	case PS_INITIALIZING:
@@ -2136,6 +2148,9 @@ void process_follow_up(struct port *p, struct ptp_message *m)
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////// uses ptp_message->header
 int process_pdelay_req(struct port *p, struct ptp_message *m)
 {
+	// DEBUG
+	printf("DEBUG: process_pdelay_req");
+
 	struct ptp_message *rsp, *fup;
 	enum transport_event event;
 	int err;
@@ -2345,6 +2360,9 @@ calc:
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////// uses ptp_message->header
 int process_pdelay_resp(struct port *p, struct ptp_message *m)
 {
+	// DEBUG
+	printf("DEBUG: process_pdelay_resp");
+
 	if (p->peer_delay_resp) {
 		if (!source_pid_eq(p->peer_delay_resp, m)) {
 			pr_err("port %hu: multiple peer responses", portnum(p));
@@ -2406,6 +2424,9 @@ void process_pdelay_resp_fup(struct port *p, struct ptp_message *m)
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////// uses ptp_message->header
 void process_sync(struct port *p, struct ptp_message *m)
 {
+	// DEBUG
+	printf("DEBUG: process_sync");
+
 	enum syfu_event event;
 	switch (p->state) {
 	case PS_INITIALIZING:
@@ -2827,6 +2848,9 @@ static enum fsm_event bc_event(struct port *p, int fd_index)
 		ts_add(&msg->hwts.ts, -p->rx_timestamp_offset);
 		clock_check_ts(p->clock, tmv_to_nanoseconds(msg->hwts.ts));
 	}
+
+	// DEBUG
+	printf("DEBUG: fsm_event bc_event");
 
 	switch (msg_type(msg)) {
 	case SYNC:
