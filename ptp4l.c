@@ -201,9 +201,6 @@ int main(int argc, char *argv[])
 
 		// i - specify a PTP port [REQUIRED]
 		case 'i':
-			// DEBUG
-			fprintf(stderr, "DEBUG: ptp4l\n");
-
 			if (!config_create_interface(optarg, cfg))
 				goto out;
 			break;
