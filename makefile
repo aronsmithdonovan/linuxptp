@@ -21,7 +21,6 @@ DEBUG	=
 CC	= $(CROSS_COMPILE)gcc
 VER     = -DVER=$(version)
 CFLAGS	= -Wall $(VER) $(incdefs) $(DEBUG) $(EXTRA_CFLAGS)
-# EXTRA_CFLAGS = -finstrument-functions
 LDLIBS	= -lm -lrt -pthread $(EXTRA_LDFLAGS)
 PRG	= ptp4l hwstamp_ctl nsm phc2sys phc_ctl pmc timemaster ts2phc
 FILTERS	= filter.o mave.o mmedian.o
@@ -96,7 +95,7 @@ distclean: clean
 	rm -f .version
 
 # Implicit rule to generate a C source file's dependencies.
-%.d : %.c
+%.d: %.c
 	@echo DEPEND $<; \
 	rm -f $@; \
 	$(CC) -MM $(CPPFLAGS) $(CFLAGS) $< > $@.$$$$; \
