@@ -1944,7 +1944,7 @@ struct dataset *port_best_foreign(struct port *port)
 int process_announce(struct port *p, struct ptp_message *m)
 {
 	// DEBUG
-	fprintf(stderr, "[DEBUG]\tport.c\tprocess_announce\n");
+	// fprintf(stderr, "[DEBUG]\tport.c\tprocess_announce\n");
 
 	int result = 0;
 
@@ -1977,7 +1977,7 @@ int process_announce(struct port *p, struct ptp_message *m)
 static int process_delay_req(struct port *p, struct ptp_message *m)
 {
 	// DEBUG
-	fprintf(stderr, "[DEBUG]\tport.c\tprocess_delay_req\n");
+	// fprintf(stderr, "[DEBUG]\tport.c\tprocess_delay_req\n");
 
 	int err, nsm, saved_seqnum_sync;
 	struct ptp_message *msg;
@@ -2045,7 +2045,7 @@ out:
 void process_delay_resp(struct port *p, struct ptp_message *m)
 {
 	// DEBUG
-	fprintf(stderr, "[DEBUG]\tport.c\tprocess_delay_resp\n");
+	// fprintf(stderr, "[DEBUG]\tport.c\tprocess_delay_resp\n");
 
 	struct delay_resp_msg *rsp = &m->delay_resp;
 	struct ptp_message *req;
@@ -2106,7 +2106,7 @@ void process_delay_resp(struct port *p, struct ptp_message *m)
 void process_follow_up(struct port *p, struct ptp_message *m)
 {
 	// DEBUG
-	fprintf(stderr, "[DEBUG]\tport.c\tprocess_follow_up\n");
+	// fprintf(stderr, "[DEBUG]\tport.c\tprocess_follow_up\n");
 
 	enum syfu_event event;
 	switch (p->state) {
@@ -2149,7 +2149,7 @@ void process_follow_up(struct port *p, struct ptp_message *m)
 int process_pdelay_req(struct port *p, struct ptp_message *m)
 {
 	// DEBUG
-	fprintf(stderr, "[DEBUG]\tport.c\tprocess_pdelay_req\n");
+	// fprintf(stderr, "[DEBUG]\tport.c\tprocess_pdelay_req\n");
 
 	struct ptp_message *rsp, *fup;
 	enum transport_event event;
@@ -2361,7 +2361,7 @@ calc:
 int process_pdelay_resp(struct port *p, struct ptp_message *m)
 {
 	// DEBUG
-	fprintf(stderr, "[DEBUG]\tport.c\tprocess_pdelay_resp\n");
+	// fprintf(stderr, "[DEBUG]\tport.c\tprocess_pdelay_resp\n");
 
 	if (p->peer_delay_resp) {
 		if (!source_pid_eq(p->peer_delay_resp, m)) {
@@ -2425,7 +2425,7 @@ void process_pdelay_resp_fup(struct port *p, struct ptp_message *m)
 void process_sync(struct port *p, struct ptp_message *m)
 {
 	// DEBUG
-	fprintf(stderr, "[DEBUG]\tport.c\tprocess_sync\n");
+	// fprintf(stderr, "[DEBUG]\tport.c\tprocess_sync\n");
 
 	enum syfu_event event;
 	switch (p->state) {
@@ -2850,7 +2850,7 @@ static enum fsm_event bc_event(struct port *p, int fd_index)
 	}
 
 	// DEBUG
-	fprintf(stderr, "[DEBUG]\tport.c\tfsm_event bc_event\n");
+	// fprintf(stderr, "[DEBUG]\tport.c\tfsm_event bc_event\n");
 
 	switch (msg_type(msg)) {
 	case SYNC:

@@ -352,7 +352,7 @@ void msg_get(struct ptp_message *m)
 int msg_post_recv(struct ptp_message *m, int cnt)
 {
 	// DEBUG
-	fprintf(stderr, "[DEBUG]\tmsg.c\tmsg_post_recv\n");
+	// fprintf(stderr, "[DEBUG]\tmsg.c\tmsg_post_recv\n");
 
 	int pdulen, type, err;
 
@@ -451,7 +451,7 @@ int msg_post_recv(struct ptp_message *m, int cnt)
 int msg_pre_send(struct ptp_message *m)
 {
 	// DEBUG
-	fprintf(stderr, "[DEBUG]\tmsg.c\tmsg_pre_send\n");
+	// fprintf(stderr, "[DEBUG]\tmsg.c\tmsg_pre_send\n");
 
 	int type;
 
