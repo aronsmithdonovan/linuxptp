@@ -101,10 +101,6 @@ static void usage(char *progname)
 */
 int main(int argc, char *argv[])
 {
-	
-	// DEBUG
-	fprintf(stderr, "\n\nDEBUG: ptp4l.main\n\n");
-
 	// initializations
 	char *config = NULL, *req_phc = NULL, *progname;
 	enum clock_type type = CLOCK_TYPE_ORDINARY;
@@ -205,6 +201,9 @@ int main(int argc, char *argv[])
 
 		// i - specify a PTP port [REQUIRED]
 		case 'i':
+			// DEBUG
+			fprintf(stderr, "DEBUG: ptp4l\n");
+
 			if (!config_create_interface(optarg, cfg))
 				goto out;
 			break;
