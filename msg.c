@@ -83,7 +83,7 @@ static void announce_post_recv(struct announce_msg *m)
 static int hdr_post_recv(struct ptp_header *m)
 {
 	// DEBUG
-	printf("DEBUG: hdr_post_recv");
+	fprintf(stderr, "[DEBUG]\tmsg.c\thdr_post_recv\n");
 
 	if ((m->ver & VERSION_MASK) != VERSION)
 		return -EPROTO;
@@ -99,7 +99,7 @@ static int hdr_post_recv(struct ptp_header *m)
 static int hdr_pre_send(struct ptp_header *m)
 {
 	// DEBUG
-	printf("DEBUG: hdr_pre_send");
+	fprintf(stderr, "[DEBUG]\tmsg.c\thdr_pre_send\n");
 
 	m->messageLength = htons(m->messageLength);  // converts UInteger16 messageLength from host CPU byte order to network byte order
 	m->correction = host2net64(m->correction);  // converts Integer64 correction from host CPU byte order to big endian byte order
@@ -352,7 +352,7 @@ void msg_get(struct ptp_message *m)
 int msg_post_recv(struct ptp_message *m, int cnt)
 {
 	// DEBUG
-	printf("DEBUG: msg_post_recv");
+	fprintf(stderr, "[DEBUG]\tmsg.c\tmsg_post_recv\n");
 
 	int pdulen, type, err;
 
@@ -451,7 +451,7 @@ int msg_post_recv(struct ptp_message *m, int cnt)
 int msg_pre_send(struct ptp_message *m)
 {
 	// DEBUG
-	printf("DEBUG: msg_pre_send");
+	fprintf(stderr, "[DEBUG]\tmsg.c\tmsg_pre_send\n");
 
 	int type;
 
