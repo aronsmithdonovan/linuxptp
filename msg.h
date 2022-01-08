@@ -45,18 +45,18 @@
 #define MANAGEMENT            0xD
 
 /* Bits for flagField[0] */
-#define ALT_MASTER     (1<<0)
-#define TWO_STEP       (1<<1)
-#define UNICAST        (1<<2)
+#define ALT_MASTER     (1<<0)  // 0b00000001
+#define TWO_STEP       (1<<1)  // 0b00000010
+#define UNICAST        (1<<2)  // 0b00000100
 
 /* Bits for flagField[1] */
-#define LEAP_61        (1<<0)
-#define LEAP_59        (1<<1)
-#define UTC_OFF_VALID  (1<<2)
-#define PTP_TIMESCALE  (1<<3)
-#define TIME_TRACEABLE (1<<4)
-#define FREQ_TRACEABLE (1<<5)
-#define SYNC_UNCERTAIN (1<<6)
+#define LEAP_61        (1<<0)  // 0b00000001
+#define LEAP_59        (1<<1)  // 0b00000010
+#define UTC_OFF_VALID  (1<<2)  // 0b00000100
+#define PTP_TIMESCALE  (1<<3)  // 0b00001000
+#define TIME_TRACEABLE (1<<4)  // 0b00010000
+#define FREQ_TRACEABLE (1<<5)  // 0b00100000
+#define SYNC_UNCERTAIN (1<<6)  // 0b01000000
 
 /*
  * Signaling interval special values. For more info look at 802.1AS table 10-11
