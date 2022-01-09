@@ -81,13 +81,13 @@ static void announce_post_recv(struct announce_msg *m)
 // converts an unsigned 8-bit int to its binary representation
 char* byte_to_bin(unsigned int n)
 {
-	static char bin[8] = { 0 };
+	static char bin[8] = {};
 	int c, k;
 	int i = 0;
 	for (c=7; c>=0; c--) {
 		k = n >> c;
 		if (k & 1) { bin[i]='1'; }
-		// else { bin[i]='0'; }
+		else { bin[i]='0'; }
 		i++;
 	}
 	return bin;
@@ -96,13 +96,13 @@ char* byte_to_bin(unsigned int n)
 // converts an unsigned 16-bit int to its binary representation
 char* word_to_bin(unsigned int n)
 {
-	static char bin[16] = { 0 };
+	static char bin[16] = {};
 	int c, k;
 	int i = 0;
 	for (c=15; c>=0; c--) {
 		k = n >> c;
 		if (k & 1) { bin[i]='1'; }
-		// else { bin[i]='0'; }
+		else { bin[i]='0'; }
 		i++;
 	}
 	return bin;
@@ -111,13 +111,13 @@ char* word_to_bin(unsigned int n)
 // converts an unsigned 32-bit int to its binary representation
 char* dword_to_bin(unsigned int n)
 {
-	static char bin[32] = { 0 };
+	static char bin[32] = {};
 	int c, k;
 	int i = 0;
 	for (c=31; c>=0; c--) {
 		k = n >> c;
 		if (k & 1) { bin[i]='1'; }
-		// else { bin[i]='0'; }
+		else { bin[i]='0'; }
 		i++;
 	}
 	return bin;
