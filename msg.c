@@ -81,46 +81,46 @@ static void announce_post_recv(struct announce_msg *m)
 // converts an unsigned 8-bit int to its binary representation
 char* byte_to_bin(unsigned int n)
 {
-	static char bin[8] = {};
+	static char bin8[8] = {};
 	int c, k;
 	int i = 0;
 	for (c=7; c>=0; c--) {
 		k = n >> c;
-		if (k & 1) { bin[i]='1'; }
-		else { bin[i]='0'; }
+		if (k & 1) { bin8[i]='1'; }
+		else { bin8[i]='0'; }
 		i++;
 	}
-	return bin;
+	return bin8;
 } 
 
 // converts an unsigned 16-bit int to its binary representation
 char* word_to_bin(unsigned int n)
 {
-	static char bin[16] = {};
+	static char bin16[16] = {};
 	int c, k;
 	int i = 0;
 	for (c=15; c>=0; c--) {
 		k = n >> c;
-		if (k & 1) { bin[i]='1'; }
-		else { bin[i]='0'; }
+		if (k & 1) { bin16[i]='1'; }
+		else { bin16[i]='0'; }
 		i++;
 	}
-	return bin;
+	return bin16;
 } 
 
 // converts an unsigned 32-bit int to its binary representation
 char* dword_to_bin(unsigned int n)
 {
-	static char bin[32] = {};
+	static char bin32[32] = {};
 	int c, k;
 	int i = 0;
 	for (c=31; c>=0; c--) {
 		k = n >> c;
-		if (k & 1) { bin[i]='1'; }
-		else { bin[i]='0'; }
+		if (k & 1) { bin32[i]='1'; }
+		else { bin32[i]='0'; }
 		i++;
 	}
-	return bin;
+	return bin32;
 } 
 
 // prints header fields to a .txt file
