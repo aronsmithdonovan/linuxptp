@@ -11,3 +11,5 @@
 /timemaster
 /ts2phc
 settings.json
+pre-send.txt
+post-receive.txt
