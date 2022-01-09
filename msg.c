@@ -187,7 +187,7 @@ static int hdr_post_recv(struct ptp_header *m)
 	// reserved1 (Octet)
 		fprintf(fp, "\t[reserved1]\t\t%s\n", byte_to_bin(m->reserved1));
 	// flagField[] (Octet)
-		fprintf(fp, "\t[flagField1]\t\t\t%s\n", byte_to_bin(m->flagField[0]));
+		fprintf(fp, "\t[flagField1]\t\t%s\n", byte_to_bin(m->flagField[0]));
 		fprintf(fp, "\t[flagField2]\t\t%s\n", byte_to_bin(m->flagField[1]));
 	// correction (Integer64)
 		fprintf(fp, "\t[correction]\t\t%ld\n", m->correction);
@@ -260,7 +260,7 @@ static int hdr_pre_send(struct ptp_header *m)
 	// reserved1 (Octet)
 		fprintf(fp, "\t[reserved1]\t\t%s\n", byte_to_bin(m->reserved1));
 	// flagField[] (Octet)
-		fprintf(fp, "\t[flagField1]\t\t\t%s\n", byte_to_bin(m->flagField[0]));
+		fprintf(fp, "\t[flagField1]\t\t%s\n", byte_to_bin(m->flagField[0]));
 		fprintf(fp, "\t[flagField2]\t\t%s\n", byte_to_bin(m->flagField[1]));
 	// correction (Integer64)
 		fprintf(fp, "\t[correction]\t\t%ld\n", m->correction);
