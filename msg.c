@@ -142,14 +142,13 @@ static void print_headers_to_file(struct ptp_header *m, char filename[])
 		fprintf(fp, "\t[reserved0]\t\t%.4s\n", byte_to_bin(m->ver & 0xf0));
 
 	// versionPTP (UInteger8)
-		fprintf(fp, "\t[versionPTP]\t\t%.4s\n", byte_to_bin((m->ver & 0x0f)<<4));
-		// fprintf(fp, "\t[versionPTP]\t\t%s\t%u\n", byte_to_bin(m->ver & 0x0f), m->ver);
+		fprintf(fp, "\t[versionPTP]\t\t%.4s\t\t(%u)\n", byte_to_bin((m->ver & 0x0f)<<4), m->ver & 0x0f);
 
 	// messageLength (UInteger16)
-		fprintf(fp, "\t[messageLength]\t\t%s\t%u\n", word_to_bin(m->messageLength), m->messageLength);
+		fprintf(fp, "\t[messageLength]\t\t%s\t(%u)\n", word_to_bin(m->messageLength), m->messageLength);
 	
 	// domainNumber (UInteger8)
-		fprintf(fp, "\t[domainNumber]\t\t%s\n", byte_to_bin(m->domainNumber));
+		fprintf(fp, "\t[domainNumber]\t\t%s\t\t(%u)\n", byte_to_bin(m->domainNumber), m->domainNumber);
 	
 	// reserved1 (Octet)
 		fprintf(fp, "\t[reserved1]\t\t%s\n", byte_to_bin(m->reserved1));
@@ -165,7 +164,7 @@ static void print_headers_to_file(struct ptp_header *m, char filename[])
 		fprintf(fp, "\t[reserved2]\t\t%.32s\n", dword_to_bin(m->reserved2));
 	
 	// sequenceId (UInteger16)
-		fprintf(fp, "\t[sequenceId]\t\t%s\n", word_to_bin(m->sequenceId));
+		fprintf(fp, "\t[sequenceId]\t\t%s\t(%u)\n", word_to_bin(m->sequenceId), m->sequenceId);
 	
 	// control (UInteger8)
 		fprintf(fp, "\t[control]\t\t%s\n", byte_to_bin(m->control));
