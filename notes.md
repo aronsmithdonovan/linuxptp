@@ -45,3 +45,9 @@
 > $ make ptp4l\
 > $ sudo date 010100001970\
 > $ sudo ./ptp4l -i eth0 -m -s -S
+
+## ADD EXECUTE PERMISSIONS TO SHELL SCRIPTS
+
+> $ chmod +x pull-and-make.sh\
+> $ chmod +x l_run.sh\
+> $ chmod +x f_run.sh
