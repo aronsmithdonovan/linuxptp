@@ -137,7 +137,7 @@ static int hdr_post_recv(struct ptp_header *m)
 	m->correction = net2host64(m->correction);  // converts Integer64 correction from network byte order to host CPU byte order
 	m->sourcePortIdentity.portNumber = ntohs(m->sourcePortIdentity.portNumber);  // converts UInteger16 sourcePortIdentity.portNumber from network byte order to host CPU byte order
 	m->sequenceId = ntohs(m->sequenceId);  // converts UInteger16 sequenceId from network byte order to host CPU byte order
-	return 0;
+	
 
 	// PRINT HEADER FIELDS TO TERMINAL
 	// // print divider
@@ -201,6 +201,8 @@ static int hdr_post_recv(struct ptp_header *m)
 		fprintf(fp, "\n===============================================================\n\n");
 	// close file
 		fclose(fp);
+
+	return 0;
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////// hdr_pre_send
