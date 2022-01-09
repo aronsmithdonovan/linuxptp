@@ -148,7 +148,7 @@ static void print_headers_to_file(struct ptp_header *m, char filename[])
 		fprintf(fp, "\t[messageLength]\t\t%s  (%u)\n", word_to_bin(m->messageLength), m->messageLength);
 	
 	// domainNumber (UInteger8)
-		fprintf(fp, "\t[domainNumber]\t\t%s  (%u)\n", byte_to_bin(m->domainNumber), m->domainNumber);
+		fprintf(fp, "\t[domainNumber]\t\t%s\n", byte_to_bin(m->domainNumber));
 	
 	// reserved1 (Octet)
 		fprintf(fp, "\t[reserved1]\t\t%s\n", byte_to_bin(m->reserved1));
