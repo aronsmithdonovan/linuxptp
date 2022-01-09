@@ -78,6 +78,51 @@ static void announce_post_recv(struct announce_msg *m)
 	m->stepsRemoved = ntohs(m->stepsRemoved);
 }
 
+// converts an unsigned byte to its binary representation
+char* byte_to_bin(unsigned int n)
+{
+	static char bin[8];
+	int c, k;
+	int i = 0;
+	for (c=7; c>=0; c--) {
+		k = n >> c;
+		if (k & 1) { bin[i]='1'; }
+		else { bin[i]='0'; }
+		i++;
+	}
+	return bin;
+} 
+
+// converts an unsigned 16-bit int to its binary representation
+char* two_bytes_to_bin(unsigned int n)
+{
+	static char bin[16];
+	int c, k;
+	int i = 0;
+	for (c=15; c>=0; c--) {
+		k = n >> c;
+		if (k & 1) { bin[i]='1'; }
+		else { bin[i]='0'; }
+		i++;
+	}
+	return bin;
+} 
+
+// converts an unsigned 32-bit int to its binary representation
+char* four_bytes_to_bin(unsigned int n)
+{
+	static char bin[32];
+	int c, k;
+	int i = 0;
+	for (c=31; c>=0; c--) {
+		k = n >> c;
+		if (k & 1) { bin[i]='1'; }
+		else { bin[i]='0'; }
+		i++;
+	}
+	return bin;
+} 
+
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////// hdr_post_recv
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////// uses ptp_header
 static int hdr_post_recv(struct ptp_header *m)
@@ -85,13 +130,41 @@ static int hdr_post_recv(struct ptp_header *m)
 	// DEBUG
 	fprintf(stderr, "[DEBUG]\tmsg.c\thdr_post_recv\n");
 
+	// convert byte order
 	if ((m->ver & VERSION_MASK) != VERSION)
 		return -EPROTO;
-	m->messageLength = ntohs(m->messageLength);
-	m->correction = net2host64(m->correction);
-	m->sourcePortIdentity.portNumber = ntohs(m->sourcePortIdentity.portNumber);
-	m->sequenceId = ntohs(m->sequenceId);
+	m->messageLength = ntohs(m->messageLength);  // converts UInteger16 messageLength from network byte order to host CPU byte order
+	m->correction = net2host64(m->correction);  // converts Integer64 correction from network byte order to host CPU byte order
+	m->sourcePortIdentity.portNumber = ntohs(m->sourcePortIdentity.portNumber);  // converts UInteger16 sourcePortIdentity.portNumber from network byte order to host CPU byte order
+	m->sequenceId = ntohs(m->sequenceId);  // converts UInteger16 sequenceId from network byte order to host CPU byte order
 	return 0;
+
+	// PRINT HEADER FIELDS TO TERMINAL
+	// print divider
+		printf("\n====================================================\n");
+	// print message type
+		printf("PRE-SEND:  %s\t", msg_type_string(m->tsmt & 0x0f));
+	// print machine timestamp
+		time_t now;
+		time(&now);
+		printf("%s\n", ctime(&now));
+	// transportSpecific (UInteger8)
+		printf("\t[transportSpecific]\t%.4s\n", byte_to_bin(m->tsmt & 0xf0));
+	// reserved (UInteger8)
+		printf("\t[reserved0]\t\t%.4s\n", byte_to_bin(m->ver & 0xf0));
+	// domainNumber (UInteger8)
+		printf("\t[domainNumber]\t\t%s\n", byte_to_bin(m->domainNumber));
+	// reserved1 (Octet)
+		printf("\t[reserved1]\t\t%s\n", byte_to_bin(m->reserved1));
+	// flagField[] (Octet)
+		printf("\t[flagField1]\t\t%s\n", byte_to_bin(m->flagField[0]));
+		printf("\t[flagField2]\t\t%s\n", byte_to_bin(m->flagField[1]));
+	// reserved2 (UInteger32)
+		printf("\t[reserved2]\t\t%.32s\n", four_bytes_to_bin(m->reserved2));
+	// control (UInteger8)
+		printf("\t[control]\t\t%s\n", byte_to_bin(m->control));
+	// print divider
+		printf("\n====================================================\n\n");
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////// hdr_pre_send
@@ -99,8 +172,36 @@ static int hdr_post_recv(struct ptp_header *m)
 static int hdr_pre_send(struct ptp_header *m)
 {
 	// DEBUG
-	fprintf(stderr, "[DEBUG]\tmsg.c\thdr_pre_send\n");
+	// fprintf(stderr, "[DEBUG]\tmsg.c\thdr_pre_send\n");
 
+	// PRINT HEADER FIELDS TO TERMINAL
+	// print divider
+		printf("\n====================================================\n");
+	// print message type
+		printf("PRE-SEND:  %s\t", msg_type_string(m->tsmt & 0x0f));
+	// print machine timestamp
+		time_t now;
+		time(&now);
+		printf("%s\n", ctime(&now));
+	// transportSpecific (UInteger8)
+		printf("\t[transportSpecific]\t%.4s\n", byte_to_bin(m->tsmt & 0xf0));
+	// reserved (UInteger8)
+		printf("\t[reserved0]\t\t%.4s\n", byte_to_bin(m->ver & 0xf0));
+	// domainNumber (UInteger8)
+		printf("\t[domainNumber]\t\t%s\n", byte_to_bin(m->domainNumber));
+	// reserved1 (Octet)
+		printf("\t[reserved1]\t\t%s\n", byte_to_bin(m->reserved1));
+	// flagField[] (Octet)
+		printf("\t[flagField1]\t\t%s\n", byte_to_bin(m->flagField[0]));
+		printf("\t[flagField2]\t\t%s\n", byte_to_bin(m->flagField[1]));
+	// reserved2 (UInteger32)
+		printf("\t[reserved2]\t\t%.32s\n", four_bytes_to_bin(m->reserved2));
+	// control (UInteger8)
+		printf("\t[control]\t\t%s\n", byte_to_bin(m->control));
+	// print divider
+		printf("\n====================================================\n\n");
+
+	// convert byte order
 	m->messageLength = htons(m->messageLength);  // converts UInteger16 messageLength from host CPU byte order to network byte order
 	m->correction = host2net64(m->correction);  // converts Integer64 correction from host CPU byte order to big endian byte order
 	m->sourcePortIdentity.portNumber = htons(m->sourcePortIdentity.portNumber);  // converts UInteger16 sourcePortIdentity.portNumber from host CPU byte order to network byte order
