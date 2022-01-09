@@ -78,8 +78,8 @@ static void announce_post_recv(struct announce_msg *m)
 	m->stepsRemoved = ntohs(m->stepsRemoved);
 }
 
-// converts an unsigned byte to its binary representation
-char* byte_to_bin(unsigned int n)
+// converts an 8-bit int to its binary representation
+char* byte_to_bin(int n)
 {
 	static char bin[8];
 	int c, k;
@@ -93,8 +93,8 @@ char* byte_to_bin(unsigned int n)
 	return bin;
 } 
 
-// converts an unsigned 16-bit int to its binary representation
-char* two_bytes_to_bin(unsigned int n)
+// converts a 16-bit int to its binary representation
+char* word_to_bin(int n)
 {
 	static char bin[16];
 	int c, k;
@@ -108,13 +108,28 @@ char* two_bytes_to_bin(unsigned int n)
 	return bin;
 } 
 
-// converts an unsigned 32-bit int to its binary representation
-char* four_bytes_to_bin(unsigned int n)
+// converts a 32-bit int to its binary representation
+char* dword_to_bin(int n)
 {
 	static char bin[32];
 	int c, k;
 	int i = 0;
 	for (c=31; c>=0; c--) {
+		k = n >> c;
+		if (k & 1) { bin[i]='1'; }
+		else { bin[i]='0'; }
+		i++;
+	}
+	return bin;
+} 
+
+// converts a 64-bit int to its binary representation
+char* qword_to_bin(int n)
+{
+	static char bin[64];
+	int c, k;
+	int i = 0;
+	for (c=63; c>=0; c--) {
 		k = n >> c;
 		if (k & 1) { bin[i]='1'; }
 		else { bin[i]='0'; }
@@ -160,7 +175,7 @@ static int hdr_post_recv(struct ptp_header *m)
 	// 	printf("\t[flagField1]\t\t%s\n", byte_to_bin(m->flagField[0]));
 	// 	printf("\t[flagField2]\t\t%s\n", byte_to_bin(m->flagField[1]));
 	// // reserved2 (UInteger32)
-	// 	printf("\t[reserved2]\t\t%.32s\n", four_bytes_to_bin(m->reserved2));
+	// 	printf("\t[reserved2]\t\t%.32s\n", dword_to_bin(m->reserved2));
 	// // control (UInteger8)
 	// 	printf("\t[control]\t\t%s\n", byte_to_bin(m->control));
 	// // print divider
@@ -181,7 +196,7 @@ static int hdr_post_recv(struct ptp_header *m)
 	// versionPTP (UInteger8)
 		fprintf(fp, "\t[versionPTP]\t\t%.4s\n", byte_to_bin((m->ver & 0xf0)<<4));
 	// messageLength (UInteger16)
-		fprintf(fp, "\t[messageLength]\t\t%s\n", two_bytes_to_bin(m->messageLength));
+		fprintf(fp, "\t[messageLength]\t\t%s\n", word_to_bin(m->messageLength));
 	// domainNumber (UInteger8)
 		fprintf(fp, "\t[domainNumber]\t\t%s\n", byte_to_bin(m->domainNumber));
 	// reserved1 (Octet)
@@ -192,7 +207,9 @@ static int hdr_post_recv(struct ptp_header *m)
 	// correction (Integer64)
 		fprintf(fp, "\t[correction]\t\t%ld\n", m->correction);
 	// reserved2 (UInteger32)
-		fprintf(fp, "\t[reserved2]\t\t%.32s\n", four_bytes_to_bin(m->reserved2));
+		fprintf(fp, "\t[reserved2]\t\t%.32s\n", dword_to_bin(m->reserved2));
+	// sequenceId (UInteger16)
+		fprintf(fp, "\t[sequenceId]\t\t%s\n", word_to_bin(m->sequenceId));
 	// control (UInteger8)
 		fprintf(fp, "\t[control]\t\t%s\n", byte_to_bin(m->control));
 	// logMessageInterval (Integer8)
@@ -233,7 +250,7 @@ static int hdr_pre_send(struct ptp_header *m)
 	// 	printf("\t[flagField1]\t\t%s\n", byte_to_bin(m->flagField[0]));
 	// 	printf("\t[flagField2]\t\t%s\n", byte_to_bin(m->flagField[1]));
 	// // reserved2 (UInteger32)
-	// 	printf("\t[reserved2]\t\t%.32s\n", four_bytes_to_bin(m->reserved2));
+	// 	printf("\t[reserved2]\t\t%.32s\n", dword_to_bin(m->reserved2));
 	// // control (UInteger8)
 	// 	printf("\t[control]\t\t%s\n", byte_to_bin(m->control));
 	// // print divider
@@ -254,7 +271,7 @@ static int hdr_pre_send(struct ptp_header *m)
 	// versionPTP (UInteger8)
 		fprintf(fp, "\t[versionPTP]\t\t%.4s\n", byte_to_bin((m->ver & 0xf0)<<4));
 	// messageLength (UInteger16)
-		fprintf(fp, "\t[messageLength]\t\t%s\n", two_bytes_to_bin(m->messageLength));
+		fprintf(fp, "\t[messageLength]\t\t%s\n", word_to_bin(m->messageLength));
 	// domainNumber (UInteger8)
 		fprintf(fp, "\t[domainNumber]\t\t%s\n", byte_to_bin(m->domainNumber));
 	// reserved1 (Octet)
@@ -265,7 +282,9 @@ static int hdr_pre_send(struct ptp_header *m)
 	// correction (Integer64)
 		fprintf(fp, "\t[correction]\t\t%ld\n", m->correction);
 	// reserved2 (UInteger32)
-		fprintf(fp, "\t[reserved2]\t\t%.32s\n", four_bytes_to_bin(m->reserved2));
+		fprintf(fp, "\t[reserved2]\t\t%.32s\n", dword_to_bin(m->reserved2));
+	// sequenceId (UInteger16)
+		fprintf(fp, "\t[sequenceId]\t\t%s\n", word_to_bin(m->sequenceId));
 	// control (UInteger8)
 		fprintf(fp, "\t[control]\t\t%s\n", byte_to_bin(m->control));
 	// logMessageInterval (Integer8)
