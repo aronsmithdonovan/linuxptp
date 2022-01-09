@@ -78,8 +78,8 @@ static void announce_post_recv(struct announce_msg *m)
 	m->stepsRemoved = ntohs(m->stepsRemoved);
 }
 
-// converts an 8-bit int to its binary representation
-char* byte_to_bin(int n)
+// converts an unsigned 8-bit int to its binary representation
+char* byte_to_bin(unsigned int n)
 {
 	static char bin[8];
 	int c, k;
@@ -93,8 +93,8 @@ char* byte_to_bin(int n)
 	return bin;
 } 
 
-// converts a 16-bit int to its binary representation
-char* word_to_bin(int n)
+// converts an unsigned 16-bit int to its binary representation
+char* word_to_bin(unsigned int n)
 {
 	static char bin[16];
 	int c, k;
@@ -108,28 +108,13 @@ char* word_to_bin(int n)
 	return bin;
 } 
 
-// converts a 32-bit int to its binary representation
-char* dword_to_bin(int n)
+// converts an unsigned 32-bit int to its binary representation
+char* dword_to_bin(unsigned int n)
 {
 	static char bin[32];
 	int c, k;
 	int i = 0;
 	for (c=31; c>=0; c--) {
-		k = n >> c;
-		if (k & 1) { bin[i]='1'; }
-		else { bin[i]='0'; }
-		i++;
-	}
-	return bin;
-} 
-
-// converts a 64-bit int to its binary representation
-char* qword_to_bin(int n)
-{
-	static char bin[64];
-	int c, k;
-	int i = 0;
-	for (c=63; c>=0; c--) {
 		k = n >> c;
 		if (k & 1) { bin[i]='1'; }
 		else { bin[i]='0'; }
