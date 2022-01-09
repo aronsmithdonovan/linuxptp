@@ -79,10 +79,10 @@ static void announce_post_recv(struct announce_msg *m)
 }
 
 // converts an unsigned 8-bit int to its binary representation
-char* byte_to_bin(unsigned int n)
+static void byte_to_bin(unsigned int n, char* bin)
 {
 	// static char bin[8] = {};
-	char* bin = malloc(8);
+	// bin = (char*)malloc(8);
 	int c, k;
 	int i = 0;
 	for (c=7; c>=0; c--) {
@@ -91,14 +91,14 @@ char* byte_to_bin(unsigned int n)
 		else { bin[i]='0'; }
 		i++;
 	}
-	return bin;
+	// return bin;
 } 
 
 // converts an unsigned 16-bit int to its binary representation
-char* word_to_bin(unsigned int n)
+static void word_to_bin(unsigned int n, char* bin)
 {
 	// static char bin[16] = {};
-	char* bin = malloc(16);
+	// bin = (char*)malloc(16);
 	int c, k;
 	int i = 0;
 	for (c=15; c>=0; c--) {
@@ -107,14 +107,14 @@ char* word_to_bin(unsigned int n)
 		else { bin[i]='0'; }
 		i++;
 	}
-	return bin;
+	// return bin;
 } 
 
 // converts an unsigned 32-bit int to its binary representation
-char* dword_to_bin(unsigned int n)
+static void dword_to_bin(unsigned int n, char* bin)
 {
 	// static char bin[32] = {};
-	char* bin = malloc(32);
+	// bin = (char*)malloc(32);
 	int c, k;
 	int i = 0;
 	for (c=31; c>=0; c--) {
@@ -123,12 +123,15 @@ char* dword_to_bin(unsigned int n)
 		else { bin[i]='0'; }
 		i++;
 	}
-	return bin;
+	// return bin;
 } 
 
 // prints header fields to a .txt file
 static void print_headers_to_file(struct ptp_header *m, char filename[])
 {
+	// initialize
+		char* bin;
+
 	// initialization
 		FILE *fp;
 		fp = fopen(filename, "a");
@@ -139,38 +142,71 @@ static void print_headers_to_file(struct ptp_header *m, char filename[])
 		fprintf(fp, "%s\t%s\n", msg_type_string(m->tsmt & 0x0f), ctime(&now));
 
 	// transportSpecific (UInteger8)
-		fprintf(fp, "\t[transportSpecific]\t%.4s\n", byte_to_bin(m->tsmt & 0xf0));
+		bin = (char*)malloc(8);
+		byte_to_bin(m->tsmt & 0xf0, bin);
+		fprintf(fp, "\t[transportSpecific]\t%.4s\n", bin);
+		free(bin);
 
 	// reserved (UInteger8)
-		fprintf(fp, "\t[reserved0]\t\t%.4s\n", byte_to_bin(m->ver & 0xf0));
+		bin = (char*)malloc(8);
+		byte_to_bin(m->ver & 0xf0, bin);
+		fprintf(fp, "\t[reserved0]\t\t%.4s\n", bin);
+		free(bin);
 
 	// versionPTP (UInteger8)
-		fprintf(fp, "\t[versionPTP]\t\t%.4s  (%u)\n", byte_to_bin((m->ver & 0x0f)<<4), m->ver & 0x0f);
+		bin = (char*)malloc(8);
+		byte_to_bin((m->ver & 0x0f)<<4, bin);
+		fprintf(fp, "\t[versionPTP]\t\t%.4s  (%u)\n", bin, m->ver & 0x0f);
+		free(bin);
 
 	// messageLength (UInteger16)
-		fprintf(fp, "\t[messageLength]\t\t%s  (%u)\n", word_to_bin(m->messageLength), m->messageLength);
+		bin = (char*)malloc(16);
+		word_to_bin(m->messageLength, bin);
+		fprintf(fp, "\t[messageLength]\t\t%.16s  (%u)\n", bin, m->messageLength);
+		free(bin);
 	
 	// domainNumber (UInteger8)
-		fprintf(fp, "\t[domainNumber]\t\t%s\n", byte_to_bin(m->domainNumber));
+		bin = (char*)malloc(8);
+		byte_to_bin(m->domainNumber, bin);
+		fprintf(fp, "\t[domainNumber]\t\t%.8s\n", bin);
+		free(bin);
 	
 	// reserved1 (Octet)
-		fprintf(fp, "\t[reserved1]\t\t%s\n", byte_to_bin(m->reserved1));
+		bin = (char*)malloc(8);
+		byte_to_bin(m->reserved1, bin);
+		fprintf(fp, "\t[reserved1]\t\t%.8s\n", bin);
+		free(bin);
 	
 	// flagField[] (Octet)
-		fprintf(fp, "\t[flagField1]\t\t%s\n", byte_to_bin(m->flagField[0]));
-		fprintf(fp, "\t[flagField2]\t\t%s\n", byte_to_bin(m->flagField[1]));
+		bin = (char*)malloc(8);
+		byte_to_bin(m->flagField[0], bin);
+		fprintf(fp, "\t[flagField1]\t\t%.8s\n", bin);
+		free(bin);
+		bin = (char*)malloc(8);
+		byte_to_bin(m->flagField[1], bin);
+		fprintf(fp, "\t[flagField2]\t\t%.8s\n", bin);
+		free(bin);
 	
 	// correction (Integer64)
 		fprintf(fp, "\t[correction]\t\t%ld\n", m->correction);
 	
 	// reserved2 (UInteger32)
-		fprintf(fp, "\t[reserved2]\t\t%.32s\n", dword_to_bin(m->reserved2));
+		bin = (char*)malloc(32);
+		dword_to_bin(m->reserved2, bin);
+		fprintf(fp, "\t[reserved2]\t\t%.32s\n", bin);
+		free(bin);
 	
 	// sequenceId (UInteger16)
-		fprintf(fp, "\t[sequenceId]\t\t%s  (%u)\n", word_to_bin(m->sequenceId), m->sequenceId);
+		bin = (char*)malloc(16);
+		word_to_bin(m->sequenceId, bin);
+		fprintf(fp, "\t[sequenceId]\t\t%.16s  (%u)\n", bin, m->sequenceId);
+		free(bin);
 	
 	// control (UInteger8)
-		fprintf(fp, "\t[control]\t\t%s\n", byte_to_bin(m->control));
+		bin = (char*)malloc(8);
+		byte_to_bin(m->control, bin);
+		fprintf(fp, "\t[control]\t\t%.8s\n", bin);
+		free(bin);
 	
 	// logMessageInterval (Integer8)
 		fprintf(fp, "\t[logMessageInterval]\t%d\n", m->logMessageInterval);
@@ -185,6 +221,9 @@ static void print_headers_to_file(struct ptp_header *m, char filename[])
 // print header fields to terminal
 static void print_headers_to_terminal(struct ptp_header *m, char qualifier[])
 {
+	// initialize
+		char* bin;
+
 	// print divider
 		printf("\n====================================================\n");
 
@@ -197,48 +236,70 @@ static void print_headers_to_terminal(struct ptp_header *m, char qualifier[])
 		printf("%s\n", ctime(&now));
 
 	// transportSpecific (UInteger8)
-		printf("\t[transportSpecific]\t%.4s\n", byte_to_bin(m->tsmt & 0xf0));
+		bin = (char*)malloc(8);
+		byte_to_bin(m->tsmt & 0xf0, bin);
+		printf("\t[transportSpecific]\t%.4s\n", bin);
 		free(bin);
 
 	// reserved (UInteger8)
-		printf("\t[reserved0]\t\t%.4s\n", byte_to_bin(m->ver & 0xf0));
+		bin = (char*)malloc(8);
+		byte_to_bin(m->ver & 0xf0, bin);
+		printf("\t[reserved0]\t\t%.4s\n", bin);
 		free(bin);
 
 	//// versionPTP (UInteger8)
-		printf("\t[versionPTP]\t\t%.4s\n", byte_to_bin((m->ver & 0x0f)<<4));
+		bin = (char*)malloc(8);
+		byte_to_bin((m->ver & 0x0f)<<4, bin);
+		printf("\t[versionPTP]\t\t%.4s  (%u)\n", bin, m->ver & 0x0f);
 		free(bin);
 
 	//// messageLength (UInteger16)
-		printf("\t[messageLength]\t\t%s\t%u\n", word_to_bin(m->messageLength), m->messageLength);
+		bin = (char*)malloc(16);
+		word_to_bin(m->messageLength, bin);
+		printf("\t[messageLength]\t\t%.16s  (%u)\n", bin, m->messageLength);
 		free(bin);
 	
 	// domainNumber (UInteger8)
-		printf("\t[domainNumber]\t\t%s\n", byte_to_bin(m->domainNumber));
+		bin = (char*)malloc(8);
+		byte_to_bin(m->domainNumber, bin);
+		printf("\t[domainNumber]\t\t%.8s\n", bin);
 		free(bin);
 	
 	// reserved1 (Octet)
-		printf("\t[reserved1]\t\t%s\n", byte_to_bin(m->reserved1));
+		bin = (char*)malloc(8);
+		byte_to_bin(m->reserved1, bin);
+		printf("\t[reserved1]\t\t%.8s\n", bin);
 		free(bin);
 	
 	// flagField[] (Octet)
-		printf("\t[flagField1]\t\t%s\n", byte_to_bin(m->flagField[0]));
+		bin = (char*)malloc(8);
+		byte_to_bin(m->flagField[0], bin);
+		printf("\t[flagField1]\t\t%.8s\n", bin);
 		free(bin);
-		printf("\t[flagField2]\t\t%s\n", byte_to_bin(m->flagField[1]));
+		bin = (char*)malloc(8);
+		byte_to_bin(m->flagField[1], bin);
+		printf("\t[flagField2]\t\t%.8s\n", bin);
 		free(bin);
 	
 	//// correction (Integer64)
 		printf("\t[correction]\t\t%ld\n", m->correction);
 	
 	// reserved2 (UInteger32)
-		printf("\t[reserved2]\t\t%.32s\n", dword_to_bin(m->reserved2));
+		bin = (char*)malloc(32);
+		dword_to_bin(m->reserved2, bin);
+		printf("\t[reserved2]\t\t%.32s\n", bin);
 		free(bin);
 	
 	//// sequenceId (UInteger16)
-		printf("\t[sequenceId]\t\t%s\n", word_to_bin(m->sequenceId));
+		bin = (char*)malloc(16);
+		word_to_bin(m->sequenceId, bin);
+		printf("\t[sequenceId]\t\t%.16s  (%u)\n", bin, m->sequenceId);
 		free(bin);
 	
 	// control (UInteger8)
-		printf("\t[control]\t\t%s\n", byte_to_bin(m->control));
+		bin = (char*)malloc(8);
+		byte_to_bin(m->control, bin);
+		printf("\t[control]\t\t%.8s\n", bin);
 		free(bin);
 	
 	//// logMessageInterval (Integer8)
