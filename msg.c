@@ -142,8 +142,8 @@ static void print_headers_to_file(struct ptp_header *m, char filename[])
 		fprintf(fp, "\t[reserved0]\t\t%.4s\n", byte_to_bin(m->ver & 0xf0));
 
 	// versionPTP (UInteger8)
-		// fprintf(fp, "\t[versionPTP]\t\t%.4s\n", byte_to_bin((m->ver & 0xf0)<<4));
-		fprintf(fp, "\t[versionPTP]\t\t%.4s\n", byte_to_bin(m->ver & 0xf0));
+		fprintf(fp, "\t[versionPTP]\t\t%.4s\n", byte_to_bin((m->ver & 0x0f)<<4));
+		// fprintf(fp, "\t[versionPTP]\t\t%s\t%u\n", byte_to_bin(m->ver & 0x0f), m->ver);
 
 	// messageLength (UInteger16)
 		fprintf(fp, "\t[messageLength]\t\t%s\t%u\n", word_to_bin(m->messageLength), m->messageLength);
@@ -200,24 +200,39 @@ static void print_headers_to_terminal(struct ptp_header *m, char qualifier[])
 	// reserved (UInteger8)
 		printf("\t[reserved0]\t\t%.4s\n", byte_to_bin(m->ver & 0xf0));
 
+	// versionPTP (UInteger8)
+		// printf("\t[versionPTP]\t\t%.4s\n", byte_to_bin((m->ver & 0x0f)<<4));
+
+	// messageLength (UInteger16)
+		// printf("\t[messageLength]\t\t%s\t%u\n", word_to_bin(m->messageLength), m->messageLength);
+	
 	// domainNumber (UInteger8)
 		printf("\t[domainNumber]\t\t%s\n", byte_to_bin(m->domainNumber));
-
+	
 	// reserved1 (Octet)
 		printf("\t[reserved1]\t\t%s\n", byte_to_bin(m->reserved1));
-
+	
 	// flagField[] (Octet)
 		printf("\t[flagField1]\t\t%s\n", byte_to_bin(m->flagField[0]));
 		printf("\t[flagField2]\t\t%s\n", byte_to_bin(m->flagField[1]));
-
+	
+	// correction (Integer64)
+		// printf("\t[correction]\t\t%ld\n", m->correction);
+	
 	// reserved2 (UInteger32)
 		printf("\t[reserved2]\t\t%.32s\n", dword_to_bin(m->reserved2));
-
+	
+	// sequenceId (UInteger16)
+		// printf("\t[sequenceId]\t\t%s\n", word_to_bin(m->sequenceId));
+	
 	// control (UInteger8)
 		printf("\t[control]\t\t%s\n", byte_to_bin(m->control));
-
-	// print divider
-		printf("\n====================================================\n\n");
+	
+	// logMessageInterval (Integer8)
+		// printf("\t[logMessageInterval]\t%d\n", m->logMessageInterval);
+	
+	// dividing line
+		printf("\n===============================================================\n\n");
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////// hdr_post_recv
