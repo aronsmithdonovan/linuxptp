@@ -5,4 +5,3 @@ rm -f post-receive.txt
 find . -type f -exec touch {} +
 make clean
 make ptp4l
-echo "done."
