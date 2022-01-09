@@ -128,7 +128,7 @@ char* four_bytes_to_bin(unsigned int n)
 static int hdr_post_recv(struct ptp_header *m)
 {
 	// DEBUG
-	fprintf(stderr, "[DEBUG]\tmsg.c\thdr_post_recv\n");
+	// fprintf(stderr, "[DEBUG]\tmsg.c\thdr_post_recv\n");
 
 	// convert byte order
 	if ((m->ver & VERSION_MASK) != VERSION)
