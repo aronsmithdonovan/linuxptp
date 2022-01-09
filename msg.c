@@ -140,31 +140,67 @@ static int hdr_post_recv(struct ptp_header *m)
 	return 0;
 
 	// PRINT HEADER FIELDS TO TERMINAL
-	// print divider
-		printf("\n====================================================\n");
-	// print message type
-		printf("PRE-SEND:  %s\t", msg_type_string(m->tsmt & 0x0f));
-	// print machine timestamp
+	// // print divider
+	// 	printf("\n====================================================\n");
+	// // print message type
+	// 	printf("POST-RECEIVE:  %s\t", msg_type_string(m->tsmt & 0x0f));
+	// // print machine timestamp
+	// 	time_t now;
+	// 	time(&now);
+	// 	printf("%s\n", ctime(&now));
+	// // transportSpecific (UInteger8)
+	// 	printf("\t[transportSpecific]\t%.4s\n", byte_to_bin(m->tsmt & 0xf0));
+	// // reserved (UInteger8)
+	// 	printf("\t[reserved0]\t\t%.4s\n", byte_to_bin(m->ver & 0xf0));
+	// // domainNumber (UInteger8)
+	// 	printf("\t[domainNumber]\t\t%s\n", byte_to_bin(m->domainNumber));
+	// // reserved1 (Octet)
+	// 	printf("\t[reserved1]\t\t%s\n", byte_to_bin(m->reserved1));
+	// // flagField[] (Octet)
+	// 	printf("\t[flagField1]\t\t%s\n", byte_to_bin(m->flagField[0]));
+	// 	printf("\t[flagField2]\t\t%s\n", byte_to_bin(m->flagField[1]));
+	// // reserved2 (UInteger32)
+	// 	printf("\t[reserved2]\t\t%.32s\n", four_bytes_to_bin(m->reserved2));
+	// // control (UInteger8)
+	// 	printf("\t[control]\t\t%s\n", byte_to_bin(m->control));
+	// // print divider
+	// 	printf("\n====================================================\n\n");
+
+	// PRINT HEADER FIELDS TO FILE
+	// initialization
+		FILE *fp;
+		fp = fopen("post-receive.txt", "a");
+	// print labels
 		time_t now;
 		time(&now);
-		printf("%s\n", ctime(&now));
+		fprintf(fp, "%s\t%s\n", msg_type_string(m->tsmt & 0x0f), ctime(&now));
 	// transportSpecific (UInteger8)
-		printf("\t[transportSpecific]\t%.4s\n", byte_to_bin(m->tsmt & 0xf0));
+		fprintf(fp, "\t[transportSpecific]\t\t%.4s\n", byte_to_bin(m->tsmt & 0xf0));
 	// reserved (UInteger8)
-		printf("\t[reserved0]\t\t%.4s\n", byte_to_bin(m->ver & 0xf0));
+		fprintf(fp, "\t[reserved0]\t\t\t\t%.4s\n", byte_to_bin(m->ver & 0xf0));
+	// versionPTP (UInteger8)
+		fprintf(fp, "\t[versionPTP]\t\t\t%.4s\n", byte_to_bin((m->ver & 0xf0)<<4));
+	// messageLength (UInteger16)
+		fprintf(fp, "\t[messageLength]\t\t\t%s\n", two_bytes_to_bin(m->messageLength));
 	// domainNumber (UInteger8)
-		printf("\t[domainNumber]\t\t%s\n", byte_to_bin(m->domainNumber));
+		fprintf(fp, "\t[domainNumber]\t\t\t%s\n", byte_to_bin(m->domainNumber));
 	// reserved1 (Octet)
-		printf("\t[reserved1]\t\t%s\n", byte_to_bin(m->reserved1));
+		fprintf(fp, "\t[reserved1]\t\t\t\t%s\n", byte_to_bin(m->reserved1));
 	// flagField[] (Octet)
-		printf("\t[flagField1]\t\t%s\n", byte_to_bin(m->flagField[0]));
-		printf("\t[flagField2]\t\t%s\n", byte_to_bin(m->flagField[1]));
+		fprintf(fp, "\t[flagField1]\t\t\t%s\n", byte_to_bin(m->flagField[0]));
+		fprintf(fp, "\t[flagField2]\t\t\t%s\n", byte_to_bin(m->flagField[1]));
+	// correction (Integer64)
+		fprintf(fp, "\t[correction]\t\t\t%ld\n", m->correction);
 	// reserved2 (UInteger32)
-		printf("\t[reserved2]\t\t%.32s\n", four_bytes_to_bin(m->reserved2));
+		fprintf(fp, "\t[reserved2]\t\t\t\t%.32s\n", four_bytes_to_bin(m->reserved2));
 	// control (UInteger8)
-		printf("\t[control]\t\t%s\n", byte_to_bin(m->control));
-	// print divider
-		printf("\n====================================================\n\n");
+		fprintf(fp, "\t[control]\t\t\t\t%s\n", byte_to_bin(m->control));
+	// logMessageInterval (Integer8)
+		fprintf(fp, "\t[logMessageInterval]\t%d\n", m->logMessageInterval);
+	// dividing line
+		fprintf(fp, "\n===============================================================\n\n");
+	// close file
+		fclose(fp);
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////// hdr_pre_send
@@ -175,31 +211,67 @@ static int hdr_pre_send(struct ptp_header *m)
 	// fprintf(stderr, "[DEBUG]\tmsg.c\thdr_pre_send\n");
 
 	// PRINT HEADER FIELDS TO TERMINAL
-	// print divider
-		printf("\n====================================================\n");
-	// print message type
-		printf("PRE-SEND:  %s\t", msg_type_string(m->tsmt & 0x0f));
-	// print machine timestamp
+	// // print divider
+	// 	printf("\n====================================================\n");
+	// // print message type
+	// 	printf("PRE-SEND:  %s\t", msg_type_string(m->tsmt & 0x0f));
+	// // print machine timestamp
+	// 	time_t now;
+	// 	time(&now);
+	// 	printf("%s\n", ctime(&now));
+	// // transportSpecific (UInteger8)
+	// 	printf("\t[transportSpecific]\t%.4s\n", byte_to_bin(m->tsmt & 0xf0));
+	// // reserved (UInteger8)
+	// 	printf("\t[reserved0]\t\t%.4s\n", byte_to_bin(m->ver & 0xf0));
+	// // domainNumber (UInteger8)
+	// 	printf("\t[domainNumber]\t\t%s\n", byte_to_bin(m->domainNumber));
+	// // reserved1 (Octet)
+	// 	printf("\t[reserved1]\t\t%s\n", byte_to_bin(m->reserved1));
+	// // flagField[] (Octet)
+	// 	printf("\t[flagField1]\t\t%s\n", byte_to_bin(m->flagField[0]));
+	// 	printf("\t[flagField2]\t\t%s\n", byte_to_bin(m->flagField[1]));
+	// // reserved2 (UInteger32)
+	// 	printf("\t[reserved2]\t\t%.32s\n", four_bytes_to_bin(m->reserved2));
+	// // control (UInteger8)
+	// 	printf("\t[control]\t\t%s\n", byte_to_bin(m->control));
+	// // print divider
+	// 	printf("\n====================================================\n\n");
+
+	// PRINT HEADER FIELDS TO FILE
+	// initialization
+		FILE *fp;
+		fp = fopen("pre-send.txt", "a");
+	// print labels
 		time_t now;
 		time(&now);
-		printf("%s\n", ctime(&now));
+		fprintf(fp, "%s\t%s\n", msg_type_string(m->tsmt & 0x0f), ctime(&now));
 	// transportSpecific (UInteger8)
-		printf("\t[transportSpecific]\t%.4s\n", byte_to_bin(m->tsmt & 0xf0));
+		fprintf(fp, "\t[transportSpecific]\t\t%.4s\n", byte_to_bin(m->tsmt & 0xf0));
 	// reserved (UInteger8)
-		printf("\t[reserved0]\t\t%.4s\n", byte_to_bin(m->ver & 0xf0));
+		fprintf(fp, "\t[reserved0]\t\t\t\t%.4s\n", byte_to_bin(m->ver & 0xf0));
+	// versionPTP (UInteger8)
+		fprintf(fp, "\t[versionPTP]\t\t\t%.4s\n", byte_to_bin((m->ver & 0xf0)<<4));
+	// messageLength (UInteger16)
+		fprintf(fp, "\t[messageLength]\t\t\t%s\n", two_bytes_to_bin(m->messageLength));
 	// domainNumber (UInteger8)
-		printf("\t[domainNumber]\t\t%s\n", byte_to_bin(m->domainNumber));
+		fprintf(fp, "\t[domainNumber]\t\t\t%s\n", byte_to_bin(m->domainNumber));
 	// reserved1 (Octet)
-		printf("\t[reserved1]\t\t%s\n", byte_to_bin(m->reserved1));
+		fprintf(fp, "\t[reserved1]\t\t\t\t%s\n", byte_to_bin(m->reserved1));
 	// flagField[] (Octet)
-		printf("\t[flagField1]\t\t%s\n", byte_to_bin(m->flagField[0]));
-		printf("\t[flagField2]\t\t%s\n", byte_to_bin(m->flagField[1]));
+		fprintf(fp, "\t[flagField1]\t\t\t%s\n", byte_to_bin(m->flagField[0]));
+		fprintf(fp, "\t[flagField2]\t\t\t%s\n", byte_to_bin(m->flagField[1]));
+	// correction (Integer64)
+		fprintf(fp, "\t[correction]\t\t\t%ld\n", m->correction);
 	// reserved2 (UInteger32)
-		printf("\t[reserved2]\t\t%.32s\n", four_bytes_to_bin(m->reserved2));
+		fprintf(fp, "\t[reserved2]\t\t\t\t%.32s\n", four_bytes_to_bin(m->reserved2));
 	// control (UInteger8)
-		printf("\t[control]\t\t%s\n", byte_to_bin(m->control));
-	// print divider
-		printf("\n====================================================\n\n");
+		fprintf(fp, "\t[control]\t\t\t\t%s\n", byte_to_bin(m->control));
+	// logMessageInterval (Integer8)
+		fprintf(fp, "\t[logMessageInterval]\t%d\n", m->logMessageInterval);
+	// dividing line
+		fprintf(fp, "\n===============================================================\n\n");
+	// close file
+		fclose(fp);
 
 	// convert byte order
 	m->messageLength = htons(m->messageLength);  // converts UInteger16 messageLength from host CPU byte order to network byte order
