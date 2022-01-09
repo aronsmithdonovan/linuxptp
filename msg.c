@@ -267,7 +267,7 @@ static int hdr_pre_send(struct ptp_header *m)
 	// fprintf(stderr, "[DEBUG]\tmsg.c\thdr_pre_send\n");
 
 	// print header fields to terminal
-	// print_headers_to_terminal(m, "PRE-SEND");
+	print_headers_to_terminal(m, "PRE-SEND");
 
 	// print header fields to file
 	print_headers_to_file(m, "pre-send.txt");
