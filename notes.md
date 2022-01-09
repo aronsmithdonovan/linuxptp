@@ -23,3 +23,21 @@
  * goal: modify these files s.t. it is possible to implement covert channels
  * `struct ptp_header` and `struct ptp_message` declarations are in `msg.h`
  * `sync_msg`, `delay_req_message`, and `delay_resp_msg`
+
+## PULL CHANGES AND PERFORM SYNC
+### leader:
+
+> $ git pull\
+> $ find . -type f -exec touch {} +\
+> $ make clean\
+> $ make ptp4l\
+> $ sudo ./ptp4l -i eth0 -m -S
+
+### follower:
+
+> $ git pull\
+> $ find . -type f -exec touch {} +\
+> $ make clean\
+> $ make ptp4l\
+> $ sudo date 010100001970
+> $ sudo ./ptp4l -i eth0 -m -s -S
