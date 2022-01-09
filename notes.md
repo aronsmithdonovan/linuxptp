@@ -28,6 +28,8 @@
 ### leader:
 
 > $ git pull\
+> $ rm -f pre-send.txt\
+> $ rm -f post-receive.txt\
 > $ find . -type f -exec touch {} +\
 > $ make clean\
 > $ make ptp4l\
@@ -36,8 +38,10 @@
 ### follower:
 
 > $ git pull\
+> $ rm -f pre-send.txt\
+> $ rm -f post-receive.txt\
 > $ find . -type f -exec touch {} +\
 > $ make clean\
 > $ make ptp4l\
-> $ sudo date 010100001970
+> $ sudo date 010100001970\
 > $ sudo ./ptp4l -i eth0 -m -s -S
