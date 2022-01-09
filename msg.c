@@ -175,26 +175,26 @@ static int hdr_post_recv(struct ptp_header *m)
 		time(&now);
 		fprintf(fp, "%s\t%s\n", msg_type_string(m->tsmt & 0x0f), ctime(&now));
 	// transportSpecific (UInteger8)
-		fprintf(fp, "\t[transportSpecific]\t\t%.4s\n", byte_to_bin(m->tsmt & 0xf0));
+		fprintf(fp, "\t[transportSpecific]\t%.4s\n", byte_to_bin(m->tsmt & 0xf0));
 	// reserved (UInteger8)
-		fprintf(fp, "\t[reserved0]\t\t\t%.4s\n", byte_to_bin(m->ver & 0xf0));
+		fprintf(fp, "\t[reserved0]\t\t%.4s\n", byte_to_bin(m->ver & 0xf0));
 	// versionPTP (UInteger8)
-		fprintf(fp, "\t[versionPTP]\t\t\t%.4s\n", byte_to_bin((m->ver & 0xf0)<<4));
+		fprintf(fp, "\t[versionPTP]\t\t%.4s\n", byte_to_bin((m->ver & 0xf0)<<4));
 	// messageLength (UInteger16)
-		fprintf(fp, "\t[messageLength]\t\t\t%s\n", two_bytes_to_bin(m->messageLength));
+		fprintf(fp, "\t[messageLength]\t\t%s\n", two_bytes_to_bin(m->messageLength));
 	// domainNumber (UInteger8)
-		fprintf(fp, "\t[domainNumber]\t\t\t%s\n", byte_to_bin(m->domainNumber));
+		fprintf(fp, "\t[domainNumber]\t\t%s\n", byte_to_bin(m->domainNumber));
 	// reserved1 (Octet)
-		fprintf(fp, "\t[reserved1]\t\t\t%s\n", byte_to_bin(m->reserved1));
+		fprintf(fp, "\t[reserved1]\t\t%s\n", byte_to_bin(m->reserved1));
 	// flagField[] (Octet)
 		fprintf(fp, "\t[flagField1]\t\t\t%s\n", byte_to_bin(m->flagField[0]));
-		fprintf(fp, "\t[flagField2]\t\t\t%s\n", byte_to_bin(m->flagField[1]));
+		fprintf(fp, "\t[flagField2]\t\t%s\n", byte_to_bin(m->flagField[1]));
 	// correction (Integer64)
-		fprintf(fp, "\t[correction]\t\t\t%ld\n", m->correction);
+		fprintf(fp, "\t[correction]\t\t%ld\n", m->correction);
 	// reserved2 (UInteger32)
-		fprintf(fp, "\t[reserved2]\t\t\t%.32s\n", four_bytes_to_bin(m->reserved2));
+		fprintf(fp, "\t[reserved2]\t\t%.32s\n", four_bytes_to_bin(m->reserved2));
 	// control (UInteger8)
-		fprintf(fp, "\t[control]\t\t\t%s\n", byte_to_bin(m->control));
+		fprintf(fp, "\t[control]\t\t%s\n", byte_to_bin(m->control));
 	// logMessageInterval (Integer8)
 		fprintf(fp, "\t[logMessageInterval]\t%d\n", m->logMessageInterval);
 	// dividing line
@@ -248,26 +248,26 @@ static int hdr_pre_send(struct ptp_header *m)
 		time(&now);
 		fprintf(fp, "%s\t%s\n", msg_type_string(m->tsmt & 0x0f), ctime(&now));
 	// transportSpecific (UInteger8)
-		fprintf(fp, "\t[transportSpecific]\t\t%.4s\n", byte_to_bin(m->tsmt & 0xf0));
+		fprintf(fp, "\t[transportSpecific]\t%.4s\n", byte_to_bin(m->tsmt & 0xf0));
 	// reserved (UInteger8)
-		fprintf(fp, "\t[reserved0]\t\t\t%.4s\n", byte_to_bin(m->ver & 0xf0));
+		fprintf(fp, "\t[reserved0]\t\t%.4s\n", byte_to_bin(m->ver & 0xf0));
 	// versionPTP (UInteger8)
-		fprintf(fp, "\t[versionPTP]\t\t\t%.4s\n", byte_to_bin((m->ver & 0xf0)<<4));
+		fprintf(fp, "\t[versionPTP]\t\t%.4s\n", byte_to_bin((m->ver & 0xf0)<<4));
 	// messageLength (UInteger16)
-		fprintf(fp, "\t[messageLength]\t\t\t%s\n", two_bytes_to_bin(m->messageLength));
+		fprintf(fp, "\t[messageLength]\t\t%s\n", two_bytes_to_bin(m->messageLength));
 	// domainNumber (UInteger8)
-		fprintf(fp, "\t[domainNumber]\t\t\t%s\n", byte_to_bin(m->domainNumber));
+		fprintf(fp, "\t[domainNumber]\t\t%s\n", byte_to_bin(m->domainNumber));
 	// reserved1 (Octet)
-		fprintf(fp, "\t[reserved1]\t\t\t%s\n", byte_to_bin(m->reserved1));
+		fprintf(fp, "\t[reserved1]\t\t%s\n", byte_to_bin(m->reserved1));
 	// flagField[] (Octet)
 		fprintf(fp, "\t[flagField1]\t\t\t%s\n", byte_to_bin(m->flagField[0]));
-		fprintf(fp, "\t[flagField2]\t\t\t%s\n", byte_to_bin(m->flagField[1]));
+		fprintf(fp, "\t[flagField2]\t\t%s\n", byte_to_bin(m->flagField[1]));
 	// correction (Integer64)
-		fprintf(fp, "\t[correction]\t\t\t%ld\n", m->correction);
+		fprintf(fp, "\t[correction]\t\t%ld\n", m->correction);
 	// reserved2 (UInteger32)
-		fprintf(fp, "\t[reserved2]\t\t\t%.32s\n", four_bytes_to_bin(m->reserved2));
+		fprintf(fp, "\t[reserved2]\t\t%.32s\n", four_bytes_to_bin(m->reserved2));
 	// control (UInteger8)
-		fprintf(fp, "\t[control]\t\t\t%s\n", byte_to_bin(m->control));
+		fprintf(fp, "\t[control]\t\t%s\n", byte_to_bin(m->control));
 	// logMessageInterval (Integer8)
 		fprintf(fp, "\t[logMessageInterval]\t%d\n", m->logMessageInterval);
 	// dividing line
