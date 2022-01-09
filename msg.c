@@ -123,6 +123,103 @@ char* dword_to_bin(unsigned int n)
 	return bin;
 } 
 
+// prints header fields to a .txt file
+static void print_headers_to_file(struct ptp_header *m, char filename[])
+{
+	// initialization
+		FILE *fp;
+		fp = fopen(filename, "a");
+
+	// print labels
+		time_t now;
+		time(&now);
+		fprintf(fp, "%s\t%s\n", msg_type_string(m->tsmt & 0x0f), ctime(&now));
+
+	// transportSpecific (UInteger8)
+		fprintf(fp, "\t[transportSpecific]\t%.4s\n", byte_to_bin(m->tsmt & 0xf0));
+
+	// reserved (UInteger8)
+		fprintf(fp, "\t[reserved0]\t\t%.4s\n", byte_to_bin(m->ver & 0xf0));
+
+	// versionPTP (UInteger8)
+		// fprintf(fp, "\t[versionPTP]\t\t%.4s\n", byte_to_bin((m->ver & 0xf0)<<4));
+		fprintf(fp, "\t[versionPTP]\t\t%.4s\n", byte_to_bin(m->ver & 0xf0));
+
+	// messageLength (UInteger16)
+		fprintf(fp, "\t[messageLength]\t\t%s\t%u\n", word_to_bin(m->messageLength), m->messageLength);
+	
+	// domainNumber (UInteger8)
+		fprintf(fp, "\t[domainNumber]\t\t%s\n", byte_to_bin(m->domainNumber));
+	
+	// reserved1 (Octet)
+		fprintf(fp, "\t[reserved1]\t\t%s\n", byte_to_bin(m->reserved1));
+	
+	// flagField[] (Octet)
+		fprintf(fp, "\t[flagField1]\t\t%s\n", byte_to_bin(m->flagField[0]));
+		fprintf(fp, "\t[flagField2]\t\t%s\n", byte_to_bin(m->flagField[1]));
+	
+	// correction (Integer64)
+		fprintf(fp, "\t[correction]\t\t%ld\n", m->correction);
+	
+	// reserved2 (UInteger32)
+		fprintf(fp, "\t[reserved2]\t\t%.32s\n", dword_to_bin(m->reserved2));
+	
+	// sequenceId (UInteger16)
+		fprintf(fp, "\t[sequenceId]\t\t%s\n", word_to_bin(m->sequenceId));
+	
+	// control (UInteger8)
+		fprintf(fp, "\t[control]\t\t%s\n", byte_to_bin(m->control));
+	
+	// logMessageInterval (Integer8)
+		fprintf(fp, "\t[logMessageInterval]\t%d\n", m->logMessageInterval);
+	
+	// dividing line
+		fprintf(fp, "\n===============================================================\n\n");
+	
+	// close file
+		fclose(fp);
+}
+
+// print header fields to terminal
+static void print_headers_to_terminal(struct ptp_header *m, char qualifier[])
+{
+	// print divider
+		printf("\n====================================================\n");
+
+	// print message type
+		printf("%s:  %s\t", qualifier, msg_type_string(m->tsmt & 0x0f));
+
+	// print machine timestamp
+		time_t now;
+		time(&now);
+		printf("%s\n", ctime(&now));
+
+	// transportSpecific (UInteger8)
+		printf("\t[transportSpecific]\t%.4s\n", byte_to_bin(m->tsmt & 0xf0));
+
+	// reserved (UInteger8)
+		printf("\t[reserved0]\t\t%.4s\n", byte_to_bin(m->ver & 0xf0));
+
+	// domainNumber (UInteger8)
+		printf("\t[domainNumber]\t\t%s\n", byte_to_bin(m->domainNumber));
+
+	// reserved1 (Octet)
+		printf("\t[reserved1]\t\t%s\n", byte_to_bin(m->reserved1));
+
+	// flagField[] (Octet)
+		printf("\t[flagField1]\t\t%s\n", byte_to_bin(m->flagField[0]));
+		printf("\t[flagField2]\t\t%s\n", byte_to_bin(m->flagField[1]));
+
+	// reserved2 (UInteger32)
+		printf("\t[reserved2]\t\t%.32s\n", dword_to_bin(m->reserved2));
+
+	// control (UInteger8)
+		printf("\t[control]\t\t%s\n", byte_to_bin(m->control));
+
+	// print divider
+		printf("\n====================================================\n\n");
+}
+
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////// hdr_post_recv
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////// uses ptp_header
 static int hdr_post_recv(struct ptp_header *m)
@@ -138,72 +235,13 @@ static int hdr_post_recv(struct ptp_header *m)
 	m->sourcePortIdentity.portNumber = ntohs(m->sourcePortIdentity.portNumber);  // converts UInteger16 sourcePortIdentity.portNumber from network byte order to host CPU byte order
 	m->sequenceId = ntohs(m->sequenceId);  // converts UInteger16 sequenceId from network byte order to host CPU byte order
 	
+	// print header fields to terminal
+	// print_headers_to_terminal(m, "POST-RECEIVE");
 
-	// PRINT HEADER FIELDS TO TERMINAL
-	// // print divider
-	// 	printf("\n====================================================\n");
-	// // print message type
-	// 	printf("POST-RECEIVE:  %s\t", msg_type_string(m->tsmt & 0x0f));
-	// // print machine timestamp
-	// 	time_t now;
-	// 	time(&now);
-	// 	printf("%s\n", ctime(&now));
-	// // transportSpecific (UInteger8)
-	// 	printf("\t[transportSpecific]\t%.4s\n", byte_to_bin(m->tsmt & 0xf0));
-	// // reserved (UInteger8)
-	// 	printf("\t[reserved0]\t\t%.4s\n", byte_to_bin(m->ver & 0xf0));
-	// // domainNumber (UInteger8)
-	// 	printf("\t[domainNumber]\t\t%s\n", byte_to_bin(m->domainNumber));
-	// // reserved1 (Octet)
-	// 	printf("\t[reserved1]\t\t%s\n", byte_to_bin(m->reserved1));
-	// // flagField[] (Octet)
-	// 	printf("\t[flagField1]\t\t%s\n", byte_to_bin(m->flagField[0]));
-	// 	printf("\t[flagField2]\t\t%s\n", byte_to_bin(m->flagField[1]));
-	// // reserved2 (UInteger32)
-	// 	printf("\t[reserved2]\t\t%.32s\n", dword_to_bin(m->reserved2));
-	// // control (UInteger8)
-	// 	printf("\t[control]\t\t%s\n", byte_to_bin(m->control));
-	// // print divider
-	// 	printf("\n====================================================\n\n");
+	// print header fields to file
+	print_headers_to_file(m, "post-receive.txt");
 
-	// PRINT HEADER FIELDS TO FILE
-	// initialization
-		FILE *fp;
-		fp = fopen("post-receive.txt", "a");
-	// print labels
-		time_t now;
-		time(&now);
-		fprintf(fp, "%s\t%s\n", msg_type_string(m->tsmt & 0x0f), ctime(&now));
-	// transportSpecific (UInteger8)
-		fprintf(fp, "\t[transportSpecific]\t%.4s\n", byte_to_bin(m->tsmt & 0xf0));
-	// reserved (UInteger8)
-		fprintf(fp, "\t[reserved0]\t\t%.4s\n", byte_to_bin(m->ver & 0xf0));
-	// versionPTP (UInteger8)
-		fprintf(fp, "\t[versionPTP]\t\t%.4s\n", byte_to_bin((m->ver & 0xf0)<<4));
-	// messageLength (UInteger16)
-		fprintf(fp, "\t[messageLength]\t\t%s\n", word_to_bin(m->messageLength));
-	// domainNumber (UInteger8)
-		fprintf(fp, "\t[domainNumber]\t\t%s\n", byte_to_bin(m->domainNumber));
-	// reserved1 (Octet)
-		fprintf(fp, "\t[reserved1]\t\t%s\n", byte_to_bin(m->reserved1));
-	// flagField[] (Octet)
-		fprintf(fp, "\t[flagField1]\t\t%s\n", byte_to_bin(m->flagField[0]));
-		fprintf(fp, "\t[flagField2]\t\t%s\n", byte_to_bin(m->flagField[1]));
-	// correction (Integer64)
-		fprintf(fp, "\t[correction]\t\t%ld\n", m->correction);
-	// reserved2 (UInteger32)
-		fprintf(fp, "\t[reserved2]\t\t%.32s\n", dword_to_bin(m->reserved2));
-	// sequenceId (UInteger16)
-		fprintf(fp, "\t[sequenceId]\t\t%s\n", word_to_bin(m->sequenceId));
-	// control (UInteger8)
-		fprintf(fp, "\t[control]\t\t%s\n", byte_to_bin(m->control));
-	// logMessageInterval (Integer8)
-		fprintf(fp, "\t[logMessageInterval]\t%d\n", m->logMessageInterval);
-	// dividing line
-		fprintf(fp, "\n===============================================================\n\n");
-	// close file
-		fclose(fp);
-
+	// return
 	return 0;
 }
 
@@ -214,76 +252,19 @@ static int hdr_pre_send(struct ptp_header *m)
 	// DEBUG
 	// fprintf(stderr, "[DEBUG]\tmsg.c\thdr_pre_send\n");
 
-	// PRINT HEADER FIELDS TO TERMINAL
-	// // print divider
-	// 	printf("\n====================================================\n");
-	// // print message type
-	// 	printf("PRE-SEND:  %s\t", msg_type_string(m->tsmt & 0x0f));
-	// // print machine timestamp
-	// 	time_t now;
-	// 	time(&now);
-	// 	printf("%s\n", ctime(&now));
-	// // transportSpecific (UInteger8)
-	// 	printf("\t[transportSpecific]\t%.4s\n", byte_to_bin(m->tsmt & 0xf0));
-	// // reserved (UInteger8)
-	// 	printf("\t[reserved0]\t\t%.4s\n", byte_to_bin(m->ver & 0xf0));
-	// // domainNumber (UInteger8)
-	// 	printf("\t[domainNumber]\t\t%s\n", byte_to_bin(m->domainNumber));
-	// // reserved1 (Octet)
-	// 	printf("\t[reserved1]\t\t%s\n", byte_to_bin(m->reserved1));
-	// // flagField[] (Octet)
-	// 	printf("\t[flagField1]\t\t%s\n", byte_to_bin(m->flagField[0]));
-	// 	printf("\t[flagField2]\t\t%s\n", byte_to_bin(m->flagField[1]));
-	// // reserved2 (UInteger32)
-	// 	printf("\t[reserved2]\t\t%.32s\n", dword_to_bin(m->reserved2));
-	// // control (UInteger8)
-	// 	printf("\t[control]\t\t%s\n", byte_to_bin(m->control));
-	// // print divider
-	// 	printf("\n====================================================\n\n");
+	// print header fields to terminal
+	// print_headers_to_terminal(m, "PRE-SEND");
 
-	// PRINT HEADER FIELDS TO FILE
-	// initialization
-		FILE *fp;
-		fp = fopen("pre-send.txt", "a");
-	// print labels
-		time_t now;
-		time(&now);
-		fprintf(fp, "%s\t%s\n", msg_type_string(m->tsmt & 0x0f), ctime(&now));
-	// transportSpecific (UInteger8)
-		fprintf(fp, "\t[transportSpecific]\t%.4s\n", byte_to_bin(m->tsmt & 0xf0));
-	// reserved (UInteger8)
-		fprintf(fp, "\t[reserved0]\t\t%.4s\n", byte_to_bin(m->ver & 0xf0));
-	// versionPTP (UInteger8)
-		fprintf(fp, "\t[versionPTP]\t\t%.4s\n", byte_to_bin((m->ver & 0xf0)<<4));
-	// messageLength (UInteger16)
-		fprintf(fp, "\t[messageLength]\t\t%s\n", word_to_bin(m->messageLength));
-	// domainNumber (UInteger8)
-		fprintf(fp, "\t[domainNumber]\t\t%s\n", byte_to_bin(m->domainNumber));
-	// reserved1 (Octet)
-		fprintf(fp, "\t[reserved1]\t\t%s\n", byte_to_bin(m->reserved1));
-	// flagField[] (Octet)
-		fprintf(fp, "\t[flagField1]\t\t%s\n", byte_to_bin(m->flagField[0]));
-		fprintf(fp, "\t[flagField2]\t\t%s\n", byte_to_bin(m->flagField[1]));
-	// correction (Integer64)
-		fprintf(fp, "\t[correction]\t\t%ld\n", m->correction);
-	// reserved2 (UInteger32)
-		fprintf(fp, "\t[reserved2]\t\t%.32s\n", dword_to_bin(m->reserved2));
-	// sequenceId (UInteger16)
-		fprintf(fp, "\t[sequenceId]\t\t%s\n", word_to_bin(m->sequenceId));
-	// control (UInteger8)
-		fprintf(fp, "\t[control]\t\t%s\n", byte_to_bin(m->control));
-	// logMessageInterval (Integer8)
-		fprintf(fp, "\t[logMessageInterval]\t%d\n", m->logMessageInterval);
-	// dividing line
-		fprintf(fp, "\n===============================================================\n\n");
-	// close file
-		fclose(fp);
+	// print header fields to file
+	print_headers_to_file(m, "pre-send.txt");
 
 	// convert byte order
 	m->messageLength = htons(m->messageLength);  // converts UInteger16 messageLength from host CPU byte order to network byte order
 	m->correction = host2net64(m->correction);  // converts Integer64 correction from host CPU byte order to big endian byte order
 	m->sourcePortIdentity.portNumber = htons(m->sourcePortIdentity.portNumber);  // converts UInteger16 sourcePortIdentity.portNumber from host CPU byte order to network byte order
 	m->sequenceId = htons(m->sequenceId);  // converts UInteger16 sequenceId from from host CPU byte order to network byte order
+	
+	// return
 	return 0;
 }
 
