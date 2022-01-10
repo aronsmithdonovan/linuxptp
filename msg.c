@@ -31,6 +31,7 @@
 #define VERSION      0x02
 
 int assume_two_step = 0;
+unsigned int message_counter = 0;
 
 /*
  * Head room fits a VLAN Ethernet header, and 'msg' is 64 bit aligned.
@@ -309,6 +310,23 @@ static void print_headers_to_terminal(struct ptp_header *m, char qualifier[])
 		printf("\n===============================================================\n\n");
 }
 
+// logs message
+static void log_message(struct ptp_header *m)
+{
+	// initialization
+		FILE *log;
+		log = fopen("message-log.txt", "a");
+
+	// log message
+		time_t now;
+		time(&now);
+		fprintf(log, "%u\t%s\t%s", message_counter, msg_type_string(m->tsmt & 0x0f), ctime(&now));
+
+	// close file
+		message_counter++;
+		fclose(log);
+}
+
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////// hdr_post_recv
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////// uses ptp_header
 static int hdr_post_recv(struct ptp_header *m)
@@ -368,6 +386,9 @@ static int hdr_pre_send(struct ptp_header *m)
 	m->sourcePortIdentity.portNumber = htons(m->sourcePortIdentity.portNumber);  // converts UInteger16 sourcePortIdentity.portNumber from host CPU byte order to network byte order
 	m->sequenceId = htons(m->sequenceId);  // converts UInteger16 sequenceId from from host CPU byte order to network byte order
 	
+	// log message
+	log_message(m);
+
 	// return
 	return 0;
 }
