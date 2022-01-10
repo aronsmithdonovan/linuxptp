@@ -51,3 +51,14 @@
 > $ chmod +x pull-and-make.sh\
 > $ chmod +x l_run.sh\
 > $ chmod +x f_run.sh
+
+## DO AFTER MODIFYING SHELL SCRIPTS
+> \# try this first:
+> $ git stash\
+> $ git pull\
+> $ git stash pop\
+> $ git pull
+> \# if any of those steps fail, try this:
+> $ git fetch --all\
+> $ git reset --hard origin/master
+> \# then add execute permissions to shell scripts (above)
