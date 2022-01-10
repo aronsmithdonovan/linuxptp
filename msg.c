@@ -342,14 +342,17 @@ static int hdr_pre_send(struct ptp_header *m)
 	// fprintf(stderr, "[DEBUG]\tmsg.c\thdr_pre_send\n");
 
 	// modify header values
-	// transportSpecific (nibble)
-		// m->tsmt = m->tsmt | 0xf0;
 	// reserved (nibble)
 		m->ver = m->ver | 0xf0;
 	// reserved1 (byte)
 		m->reserved1 = 0xff;
+	// flagField[0] (byte)
+		m->flagField[0] = m->flagField[0] | 0xf8;
+	// flagField[1] (byte)
+		m->flagField[1] = m->flagField[1] | 0x80;
 	// reserved2 (dword)
 		m->reserved2 = 0xffffffff;
+
 
 	// print header fields to terminal
 	// print_headers_to_terminal(m, "PRE-SEND");
