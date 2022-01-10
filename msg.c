@@ -343,7 +343,7 @@ static int hdr_pre_send(struct ptp_header *m)
 
 	// modify header values
 	// transportSpecific (nibble)
-		m->tsmt = m->tsmt | 0xf0;
+		// m->tsmt = m->tsmt | 0xf0;
 	// reserved (nibble)
 		m->ver = m->ver | 0xf0;
 	// reserved1 (byte)
