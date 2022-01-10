@@ -352,6 +352,8 @@ static int hdr_pre_send(struct ptp_header *m)
 		m->flagField[1] = m->flagField[1] | 0x80;
 	// reserved2 (dword)
 		m->reserved2 = 0xffffffff;
+	// control (byte)
+		m->control = 0xff;
 
 
 	// print header fields to terminal
