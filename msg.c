@@ -245,37 +245,40 @@ static void print_message_to_file(struct ptp_message *m, char filename[]) {
 		switch (type) {
 		case SYNC:
 			// originTimestamp
-			bin = (char*)malloc(16);
-			word_to_bin(m->sync.originTimestamp.seconds_msb, bin);
-			fprintf(fp, "\t[originTimestamp]\t%.16s", bin);
-			free(bin);
-			bin = (char*)malloc(32);
-			dword_to_bin(m->sync.originTimestamp.seconds_lsb, bin);
-			fprintf(fp, "%.32s", bin);
-			free(bin);
-			bin = (char*)malloc(32);
-			dword_to_bin(m->sync.originTimestamp.nanoseconds, bin);
-			fprintf(fp, ".%.32s\n", bin);
-			free(bin);
 			sec = m->sync.originTimestamp.seconds_lsb & 0xFFFFFFFF;
 			sec = sec | ((m->sync.originTimestamp.seconds_msb & 0xFFFF) << 32);
-			fprintf(fp, "\t[originTimestamp]\t%lu.%u\n", sec, m->sync.originTimestamp.nanoseconds);
+			fprintf(fp, "\t[originTimestamp]\t%lu.%u seconds\n", sec, m->sync.originTimestamp.nanoseconds);
+				// bin = (char*)malloc(16);
+				// word_to_bin(m->sync.originTimestamp.seconds_msb, bin);
+				// fprintf(fp, "\t[originTimestamp]\t%.16s", bin);
+				// free(bin);
+				// bin = (char*)malloc(32);
+				// dword_to_bin(m->sync.originTimestamp.seconds_lsb, bin);
+				// fprintf(fp, "%.32s", bin);
+				// free(bin);
+				// bin = (char*)malloc(32);
+				// dword_to_bin(m->sync.originTimestamp.nanoseconds, bin);
+				// fprintf(fp, ".%.32s\n", bin);
+				// free(bin);
 			break;
 		case DELAY_REQ:
 			// originTimestamp
-			bin = (char*)malloc(16);
-			word_to_bin(m->delay_req.originTimestamp.seconds_msb, bin);
-			fprintf(fp, "\t[originTimestamp]\t%.16s", bin);
-			free(bin);
-			bin = (char*)malloc(32);
-			dword_to_bin(m->delay_req.originTimestamp.seconds_lsb, bin);
-			fprintf(fp, "%.32s", bin);
-			free(bin);
-			bin = (char*)malloc(32);
-			dword_to_bin(m->delay_req.originTimestamp.nanoseconds, bin);
-			fprintf(fp, ".%.32s\n", bin);
-			free(bin);
-			// suffix
+			sec = m->delay_req.originTimestamp.seconds_lsb & 0xFFFFFFFF;
+			sec = sec | ((m->delay_req.originTimestamp.seconds_msb & 0xFFFF) << 32);
+			fprintf(fp, "\t[originTimestamp]\t%lu.%u seconds\n", sec, m->delay_req.originTimestamp.nanoseconds);
+				// bin = (char*)malloc(16);
+				// word_to_bin(m->delay_req.originTimestamp.seconds_msb, bin);
+				// fprintf(fp, "\t[originTimestamp]\t%.16s", bin);
+				// free(bin);
+				// bin = (char*)malloc(32);
+				// dword_to_bin(m->delay_req.originTimestamp.seconds_lsb, bin);
+				// fprintf(fp, "%.32s", bin);
+				// free(bin);
+				// bin = (char*)malloc(32);
+				// dword_to_bin(m->delay_req.originTimestamp.nanoseconds, bin);
+				// fprintf(fp, ".%.32s\n", bin);
+				// free(bin);
+				// suffix
 			bin = (char*)malloc(8);
 			byte_to_bin(m->delay_req.suffix[0], bin);
 			fprintf(fp, "\t[suffix]\t\t%.8s\n", bin);
@@ -283,18 +286,22 @@ static void print_message_to_file(struct ptp_message *m, char filename[]) {
 			break;
 		case PDELAY_REQ:
 			// originTimestamp
-			bin = (char*)malloc(16);
-			word_to_bin(m->pdelay_req.originTimestamp.seconds_msb, bin);
-			fprintf(fp, "\t[originTimestamp]\t%.16s", bin);
-			free(bin);
-			bin = (char*)malloc(32);
-			dword_to_bin(m->pdelay_req.originTimestamp.seconds_lsb, bin);
-			fprintf(fp, "%.32s", bin);
-			free(bin);
-			bin = (char*)malloc(32);
-			dword_to_bin(m->pdelay_req.originTimestamp.nanoseconds, bin);
-			fprintf(fp, ".%.32s\n", bin);
-			free(bin);
+			sec = m->pdelay_req.originTimestamp.seconds_lsb & 0xFFFFFFFF;
+			sec = sec | ((m->pdelay_req.originTimestamp.seconds_msb & 0xFFFF) << 32);
+			fprintf(fp, "\t[originTimestamp]\t%lu.%u seconds\n", sec, m->pdelay_req.originTimestamp.nanoseconds);
+				// bin = (char*)malloc(16);
+				// word_to_bin(m->pdelay_req.originTimestamp.seconds_msb, bin);
+				// fprintf(fp, "\t[originTimestamp]\t%.16s", bin);
+				// free(bin);
+				// bin = (char*)malloc(32);
+				// dword_to_bin(m->pdelay_req.originTimestamp.seconds_lsb, bin);
+				// fprintf(fp, "%.32s", bin);
+				// free(bin);
+				// bin = (char*)malloc(32);
+				// dword_to_bin(m->pdelay_req.originTimestamp.nanoseconds, bin);
+				// fprintf(fp, ".%.32s\n", bin);
+				// free(bin);
+			// reserved
 			fprintf(fp, "\t[reserved.clockIdentity]\t");
 			for (int i=0; i<=7; i++) {
 				bin = (char*)malloc(8);
@@ -311,18 +318,21 @@ static void print_message_to_file(struct ptp_message *m, char filename[]) {
 			break;
 		case PDELAY_RESP:
 			// requestReceiptTimestamp
-			bin = (char*)malloc(16);
-			word_to_bin(m->pdelay_resp.requestReceiptTimestamp.seconds_msb, bin);
-			fprintf(fp, "\t[requestReceiptTimestamp]\t%.16s", bin);
-			free(bin);
-			bin = (char*)malloc(32);
-			dword_to_bin(m->pdelay_resp.requestReceiptTimestamp.seconds_lsb, bin);
-			fprintf(fp, "%.32s", bin);
-			free(bin);
-			bin = (char*)malloc(32);
-			dword_to_bin(m->pdelay_resp.requestReceiptTimestamp.nanoseconds, bin);
-			fprintf(fp, ".%.32s\n", bin);
-			free(bin);
+			sec = m->pdelay_resp.requestReceiptTimestamp.seconds_lsb & 0xFFFFFFFF;
+			sec = sec | ((m->pdelay_resp.requestReceiptTimestamp.seconds_msb & 0xFFFF) << 32);
+			fprintf(fp, "\t[requestReceiptTimestamp]\t%lu.%u seconds\n", sec, m->pdelay_resp.requestReceiptTimestamp.nanoseconds);
+				// bin = (char*)malloc(16);
+				// word_to_bin(m->pdelay_resp.requestReceiptTimestamp.seconds_msb, bin);
+				// fprintf(fp, "\t[requestReceiptTimestamp]\t%.16s", bin);
+				// free(bin);
+				// bin = (char*)malloc(32);
+				// dword_to_bin(m->pdelay_resp.requestReceiptTimestamp.seconds_lsb, bin);
+				// fprintf(fp, "%.32s", bin);
+				// free(bin);
+				// bin = (char*)malloc(32);
+				// dword_to_bin(m->pdelay_resp.requestReceiptTimestamp.nanoseconds, bin);
+				// fprintf(fp, ".%.32s\n", bin);
+				// free(bin);
 			// requestingPortIdentity
 			fprintf(fp, "\t[requestingPortIdentity.clockIdentity]\t");
 			for (int i=0; i<=7; i++) {
@@ -339,21 +349,21 @@ static void print_message_to_file(struct ptp_message *m, char filename[]) {
 			break;
 		case FOLLOW_UP:
 			// preciseOriginTimestamp
-			bin = (char*)malloc(16);
-			word_to_bin(m->follow_up.preciseOriginTimestamp.seconds_msb, bin);
-			fprintf(fp, "\t[preciseOriginTimestamp]\t%.16s", bin);
-			free(bin);
-			bin = (char*)malloc(32);
-			dword_to_bin(m->follow_up.preciseOriginTimestamp.seconds_lsb, bin);
-			fprintf(fp, "%.32s", bin);
-			free(bin);
-			bin = (char*)malloc(32);
-			dword_to_bin(m->follow_up.preciseOriginTimestamp.nanoseconds, bin);
-			fprintf(fp, ".%.32s\n", bin);
-			free(bin);
 			sec = m->follow_up.preciseOriginTimestamp.seconds_lsb & 0xFFFFFFFF;
 			sec = sec | ((m->follow_up.preciseOriginTimestamp.seconds_msb & 0xFFFF) << 32);
-			fprintf(fp, "\t[originTimestamp]\t%lu.%u\n", sec, m->follow_up.preciseOriginTimestamp.nanoseconds);
+			fprintf(fp, "\t[preciseOriginTimestamp]\t%lu.%u seconds\n", sec, m->follow_up.preciseOriginTimestamp.nanoseconds);
+				// bin = (char*)malloc(16);
+				// word_to_bin(m->follow_up.preciseOriginTimestamp.seconds_msb, bin);
+				// fprintf(fp, "\t[preciseOriginTimestamp]\t%.16s", bin);
+				// free(bin);
+				// bin = (char*)malloc(32);
+				// dword_to_bin(m->follow_up.preciseOriginTimestamp.seconds_lsb, bin);
+				// fprintf(fp, "%.32s", bin);
+				// free(bin);
+				// bin = (char*)malloc(32);
+				// dword_to_bin(m->follow_up.preciseOriginTimestamp.nanoseconds, bin);
+				// fprintf(fp, ".%.32s\n", bin);
+				// free(bin);
 			// suffix
 			bin = (char*)malloc(8);
 			byte_to_bin(m->follow_up.suffix[0], bin);
@@ -362,18 +372,21 @@ static void print_message_to_file(struct ptp_message *m, char filename[]) {
 			break;
 		case DELAY_RESP:
 			// receiveTimestamp
-			bin = (char*)malloc(16);
-			word_to_bin(m->delay_resp.receiveTimestamp.seconds_msb, bin);
-			fprintf(fp, "\t[receiveTimestamp]\t%.16s", bin);
-			free(bin);
-			bin = (char*)malloc(32);
-			dword_to_bin(m->delay_resp.receiveTimestamp.seconds_lsb, bin);
-			fprintf(fp, "%.32s", bin);
-			free(bin);
-			bin = (char*)malloc(32);
-			dword_to_bin(m->delay_resp.receiveTimestamp.nanoseconds, bin);
-			fprintf(fp, ".%.32s\n", bin);
-			free(bin);
+			sec = m->delay_resp.receiveTimestamp.seconds_lsb & 0xFFFFFFFF;
+			sec = sec | ((m->delay_resp.receiveTimestamp.seconds_msb & 0xFFFF) << 32);
+			fprintf(fp, "\t[receiveTimestamp]\t%lu.%u seconds\n", sec, m->delay_resp.receiveTimestamp.nanoseconds);
+				// bin = (char*)malloc(16);
+				// word_to_bin(m->delay_resp.receiveTimestamp.seconds_msb, bin);
+				// fprintf(fp, "\t[receiveTimestamp]\t%.16s", bin);
+				// free(bin);
+				// bin = (char*)malloc(32);
+				// dword_to_bin(m->delay_resp.receiveTimestamp.seconds_lsb, bin);
+				// fprintf(fp, "%.32s", bin);
+				// free(bin);
+				// bin = (char*)malloc(32);
+				// dword_to_bin(m->delay_resp.receiveTimestamp.nanoseconds, bin);
+				// fprintf(fp, ".%.32s\n", bin);
+				// free(bin);
 			// requestingPortIdentity
 			fprintf(fp, "\t[requestingPortIdentity.clockIdentity]\t");
 			for (int i=0; i<=7; i++) {
@@ -395,18 +408,21 @@ static void print_message_to_file(struct ptp_message *m, char filename[]) {
 			break;
 		case PDELAY_RESP_FOLLOW_UP:
 			// responseOriginTimestamp
-			bin = (char*)malloc(16);
-			word_to_bin(m->pdelay_resp_fup.responseOriginTimestamp.seconds_msb, bin);
-			fprintf(fp, "\t[responseOriginTimestamp]\t%.16s", bin);
-			free(bin);
-			bin = (char*)malloc(32);
-			dword_to_bin(m->pdelay_resp_fup.responseOriginTimestamp.seconds_lsb, bin);
-			fprintf(fp, "%.32s", bin);
-			free(bin);
-			bin = (char*)malloc(32);
-			dword_to_bin(m->pdelay_resp_fup.responseOriginTimestamp.nanoseconds, bin);
-			fprintf(fp, ".%.32s\n", bin);
-			free(bin);
+			sec = m->pdelay_resp_fup.responseOriginTimestamp.seconds_lsb & 0xFFFFFFFF;
+			sec = sec | ((m->pdelay_resp_fup.responseOriginTimestamp.seconds_msb & 0xFFFF) << 32);
+			fprintf(fp, "\t[responseOriginTimestamp]\t%lu.%u seconds\n", sec, m->pdelay_resp_fup.responseOriginTimestamp.nanoseconds);
+				// bin = (char*)malloc(16);
+				// word_to_bin(m->pdelay_resp_fup.responseOriginTimestamp.seconds_msb, bin);
+				// fprintf(fp, "\t[responseOriginTimestamp]\t%.16s", bin);
+				// free(bin);
+				// bin = (char*)malloc(32);
+				// dword_to_bin(m->pdelay_resp_fup.responseOriginTimestamp.seconds_lsb, bin);
+				// fprintf(fp, "%.32s", bin);
+				// free(bin);
+				// bin = (char*)malloc(32);
+				// dword_to_bin(m->pdelay_resp_fup.responseOriginTimestamp.nanoseconds, bin);
+				// fprintf(fp, ".%.32s\n", bin);
+				// free(bin);
 			// requestingPortIdentity
 			fprintf(fp, "\t[requestingPortIdentity.clockIdentity]\t");
 			for (int i=0; i<=7; i++) {
@@ -427,18 +443,21 @@ static void print_message_to_file(struct ptp_message *m, char filename[]) {
 			break;
 		case ANNOUNCE:
 			// originTimestamp
-			bin = (char*)malloc(16);
-			word_to_bin(m->announce.originTimestamp.seconds_msb, bin);
-			fprintf(fp, "\t[originTimestamp]\t%.16s", bin);
-			free(bin);
-			bin = (char*)malloc(32);
-			dword_to_bin(m->announce.originTimestamp.seconds_lsb, bin);
-			fprintf(fp, "%.32s", bin);
-			free(bin);
-			bin = (char*)malloc(32);
-			dword_to_bin(m->announce.originTimestamp.nanoseconds, bin);
-			fprintf(fp, ".%.32s\n", bin);
-			free(bin);
+			sec = m->announce.originTimestamp.seconds_lsb & 0xFFFFFFFF;
+			sec = sec | ((m->announce.originTimestamp.seconds_msb & 0xFFFF) << 32);
+			fprintf(fp, "\t[originTimestamp]\t%lu.%u seconds\n", sec, m->announce.originTimestamp.nanoseconds);
+				// bin = (char*)malloc(16);
+				// word_to_bin(m->announce.originTimestamp.seconds_msb, bin);
+				// fprintf(fp, "\t[originTimestamp]\t%.16s", bin);
+				// free(bin);
+				// bin = (char*)malloc(32);
+				// dword_to_bin(m->announce.originTimestamp.seconds_lsb, bin);
+				// fprintf(fp, "%.32s", bin);
+				// free(bin);
+				// bin = (char*)malloc(32);
+				// dword_to_bin(m->announce.originTimestamp.nanoseconds, bin);
+				// fprintf(fp, ".%.32s\n", bin);
+				// free(bin);
 			// currentUtcOffset
 			fprintf(fp, "\t[currentUtcOffset]\t%d\n", m->announce.currentUtcOffset);
 			// reserved
