@@ -103,6 +103,7 @@ struct ptp_header {
 	Integer8            logMessageInterval;
 } PACKED;
 
+///////////////////////////////////////////////////////////////////////////////////////////////////////////// announce_msg
 struct announce_msg {
 	struct ptp_header    hdr;
 	struct Timestamp     originTimestamp;
@@ -130,6 +131,7 @@ struct delay_req_msg {
 	uint8_t             suffix[0];
 } PACKED;
 
+///////////////////////////////////////////////////////////////////////////////////////////////////////////// follow_up_message
 struct follow_up_msg {
 	struct ptp_header   hdr;
 	struct Timestamp    preciseOriginTimestamp;
@@ -144,18 +146,21 @@ struct delay_resp_msg {
 	uint8_t             suffix[0];
 } PACKED;
 
+///////////////////////////////////////////////////////////////////////////////////////////////////////////// pdelay_req_msg
 struct pdelay_req_msg {
 	struct ptp_header   hdr;
 	struct Timestamp    originTimestamp;
 	struct PortIdentity reserved;
 } PACKED;
 
+///////////////////////////////////////////////////////////////////////////////////////////////////////////// pdelay_resp_msg
 struct pdelay_resp_msg {
 	struct ptp_header   hdr;
 	struct Timestamp    requestReceiptTimestamp;
 	struct PortIdentity requestingPortIdentity;
 } PACKED;
 
+///////////////////////////////////////////////////////////////////////////////////////////////////////////// pdelay_resp_fup_msg
 struct pdelay_resp_fup_msg {
 	struct ptp_header   hdr;
 	struct Timestamp    responseOriginTimestamp;
@@ -163,12 +168,14 @@ struct pdelay_resp_fup_msg {
 	uint8_t             suffix[0];
 } PACKED;
 
+///////////////////////////////////////////////////////////////////////////////////////////////////////////// signaling_msg
 struct signaling_msg {
 	struct ptp_header   hdr;
 	struct PortIdentity targetPortIdentity;
 	uint8_t             suffix[0];
 } PACKED;
 
+///////////////////////////////////////////////////////////////////////////////////////////////////////////// management_msg
 struct management_msg {
 	struct ptp_header   hdr;
 	struct PortIdentity targetPortIdentity;
@@ -179,6 +186,7 @@ struct management_msg {
 	uint8_t             suffix[0];
 } PACKED;
 
+///////////////////////////////////////////////////////////////////////////////////////////////////////////// message_data
 struct message_data {
 	uint8_t buffer[1500];
 } PACKED;
