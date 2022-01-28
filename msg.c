@@ -229,6 +229,7 @@ static void print_message_to_file(struct ptp_message *m, char filename[]) {
 	
 	// initialize
 		char* bin;
+		unsigned long sec = 0;
 
 	// file initialization
 		FILE *fp;
@@ -243,7 +244,6 @@ static void print_message_to_file(struct ptp_message *m, char filename[]) {
 	// switch
 		switch (type) {
 		case SYNC:
-			uint64_t sec;
 			sec = m->sync.originTimestamp.seconds_lsb & 0xFFFFFFFF;
 			sec = sec | (m->sync.originTimestamp.seconds_msb << 16);
 			// originTimestamp
@@ -259,7 +259,7 @@ static void print_message_to_file(struct ptp_message *m, char filename[]) {
 			dword_to_bin(m->sync.originTimestamp.nanoseconds, bin);
 			fprintf(fp, ".%.32s\n", bin);
 			free(bin);
-			fprintf(fp, "\t[originTimestamp]\t%u.%u\n", sec, m->sync.originTimestamp.nanoseconds);
+			fprintf(fp, "\t[originTimestamp]\t%lu.%u\n", sec, m->sync.originTimestamp.nanoseconds);
 			break;
 		case DELAY_REQ:
 			// originTimestamp
