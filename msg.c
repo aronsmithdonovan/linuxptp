@@ -229,7 +229,7 @@ static void print_message_to_file(struct ptp_message *m, char filename[]) {
 	
 	// initialize
 		char* bin;
-		unsigned long sec = 0;
+		unsigned long sec;
 
 	// file initialization
 		FILE *fp;
@@ -245,8 +245,8 @@ static void print_message_to_file(struct ptp_message *m, char filename[]) {
 		switch (type) {
 		case SYNC:
 			// originTimestamp
-			sec = m->sync.originTimestamp.seconds_lsb & 0xFFFFFFFF;
-			sec = sec | ((m->sync.originTimestamp.seconds_msb & 0xFFFF) << 32);
+			sec = (unsigned long) m->sync.originTimestamp.seconds_lsb & 0xFFFFFFFF;
+			sec = sec | (((unsigned long) m->sync.originTimestamp.seconds_msb & 0xFFFF) << 32);
 			fprintf(fp, "\t[originTimestamp]\t%lu.%u seconds\n", sec, m->sync.originTimestamp.nanoseconds);
 				// bin = (char*)malloc(16);
 				// word_to_bin(m->sync.originTimestamp.seconds_msb, bin);
@@ -263,8 +263,8 @@ static void print_message_to_file(struct ptp_message *m, char filename[]) {
 			break;
 		case DELAY_REQ:
 			// originTimestamp
-			sec = m->delay_req.originTimestamp.seconds_lsb & 0xFFFFFFFF;
-			sec = sec | ((m->delay_req.originTimestamp.seconds_msb & 0xFFFF) << 32);
+			sec = (unsigned long) m->delay_req.originTimestamp.seconds_lsb & 0xFFFFFFFF;
+			sec = sec | (((unsigned long) m->delay_req.originTimestamp.seconds_msb & 0xFFFF) << 32);
 			fprintf(fp, "\t[originTimestamp]\t%lu.%u seconds\n", sec, m->delay_req.originTimestamp.nanoseconds);
 				// bin = (char*)malloc(16);
 				// word_to_bin(m->delay_req.originTimestamp.seconds_msb, bin);
@@ -286,8 +286,8 @@ static void print_message_to_file(struct ptp_message *m, char filename[]) {
 			break;
 		case PDELAY_REQ:
 			// originTimestamp
-			sec = m->pdelay_req.originTimestamp.seconds_lsb & 0xFFFFFFFF;
-			sec = sec | ((m->pdelay_req.originTimestamp.seconds_msb & 0xFFFF) << 32);
+			sec = (unsigned long) m->pdelay_req.originTimestamp.seconds_lsb & 0xFFFFFFFF;
+			sec = sec | (((unsigned long) m->pdelay_req.originTimestamp.seconds_msb & 0xFFFF) << 32);
 			fprintf(fp, "\t[originTimestamp]\t%lu.%u seconds\n", sec, m->pdelay_req.originTimestamp.nanoseconds);
 				// bin = (char*)malloc(16);
 				// word_to_bin(m->pdelay_req.originTimestamp.seconds_msb, bin);
@@ -318,8 +318,8 @@ static void print_message_to_file(struct ptp_message *m, char filename[]) {
 			break;
 		case PDELAY_RESP:
 			// requestReceiptTimestamp
-			sec = m->pdelay_resp.requestReceiptTimestamp.seconds_lsb & 0xFFFFFFFF;
-			sec = sec | ((m->pdelay_resp.requestReceiptTimestamp.seconds_msb & 0xFFFF) << 32);
+			sec = (unsigned long) m->pdelay_resp.requestReceiptTimestamp.seconds_lsb & 0xFFFFFFFF;
+			sec = sec | (((unsigned long) m->pdelay_resp.requestReceiptTimestamp.seconds_msb & 0xFFFF) << 32);
 			fprintf(fp, "\t[requestReceiptTimestamp]\t%lu.%u seconds\n", sec, m->pdelay_resp.requestReceiptTimestamp.nanoseconds);
 				// bin = (char*)malloc(16);
 				// word_to_bin(m->pdelay_resp.requestReceiptTimestamp.seconds_msb, bin);
@@ -349,8 +349,8 @@ static void print_message_to_file(struct ptp_message *m, char filename[]) {
 			break;
 		case FOLLOW_UP:
 			// preciseOriginTimestamp
-			sec = m->follow_up.preciseOriginTimestamp.seconds_lsb & 0xFFFFFFFF;
-			sec = sec | ((m->follow_up.preciseOriginTimestamp.seconds_msb & 0xFFFF) << 32);
+			sec = (unsigned long) m->follow_up.preciseOriginTimestamp.seconds_lsb & 0xFFFFFFFF;
+			sec = sec | (((unsigned long) m->follow_up.preciseOriginTimestamp.seconds_msb & 0xFFFF) << 32);
 			fprintf(fp, "\t[preciseOriginTimestamp]\t%lu.%u seconds\n", sec, m->follow_up.preciseOriginTimestamp.nanoseconds);
 				// bin = (char*)malloc(16);
 				// word_to_bin(m->follow_up.preciseOriginTimestamp.seconds_msb, bin);
@@ -372,8 +372,8 @@ static void print_message_to_file(struct ptp_message *m, char filename[]) {
 			break;
 		case DELAY_RESP:
 			// receiveTimestamp
-			sec = m->delay_resp.receiveTimestamp.seconds_lsb & 0xFFFFFFFF;
-			sec = sec | ((m->delay_resp.receiveTimestamp.seconds_msb & 0xFFFF) << 32);
+			sec = (unsigned long) m->delay_resp.receiveTimestamp.seconds_lsb & 0xFFFFFFFF;
+			sec = sec | (((unsigned long) m->delay_resp.receiveTimestamp.seconds_msb & 0xFFFF) << 32);
 			fprintf(fp, "\t[receiveTimestamp]\t%lu.%u seconds\n", sec, m->delay_resp.receiveTimestamp.nanoseconds);
 				// bin = (char*)malloc(16);
 				// word_to_bin(m->delay_resp.receiveTimestamp.seconds_msb, bin);
@@ -408,8 +408,8 @@ static void print_message_to_file(struct ptp_message *m, char filename[]) {
 			break;
 		case PDELAY_RESP_FOLLOW_UP:
 			// responseOriginTimestamp
-			sec = m->pdelay_resp_fup.responseOriginTimestamp.seconds_lsb & 0xFFFFFFFF;
-			sec = sec | ((m->pdelay_resp_fup.responseOriginTimestamp.seconds_msb & 0xFFFF) << 32);
+			sec = (unsigned long) m->pdelay_resp_fup.responseOriginTimestamp.seconds_lsb & 0xFFFFFFFF;
+			sec = sec | (((unsigned long) m->pdelay_resp_fup.responseOriginTimestamp.seconds_msb & 0xFFFF) << 32);
 			fprintf(fp, "\t[responseOriginTimestamp]\t%lu.%u seconds\n", sec, m->pdelay_resp_fup.responseOriginTimestamp.nanoseconds);
 				// bin = (char*)malloc(16);
 				// word_to_bin(m->pdelay_resp_fup.responseOriginTimestamp.seconds_msb, bin);
@@ -443,8 +443,8 @@ static void print_message_to_file(struct ptp_message *m, char filename[]) {
 			break;
 		case ANNOUNCE:
 			// originTimestamp
-			sec = m->announce.originTimestamp.seconds_lsb & 0xFFFFFFFF;
-			sec = sec | ((m->announce.originTimestamp.seconds_msb & 0xFFFF) << 32);
+			sec = (unsigned long) m->announce.originTimestamp.seconds_lsb & 0xFFFFFFFF;
+			sec = sec | (((unsigned long) m->announce.originTimestamp.seconds_msb & 0xFFFF) << 32);
 			fprintf(fp, "\t[originTimestamp]\t%lu.%u seconds\n", sec, m->announce.originTimestamp.nanoseconds);
 				// bin = (char*)malloc(16);
 				// word_to_bin(m->announce.originTimestamp.seconds_msb, bin);
