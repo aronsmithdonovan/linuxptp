@@ -244,8 +244,6 @@ static void print_message_to_file(struct ptp_message *m, char filename[]) {
 	// switch
 		switch (type) {
 		case SYNC:
-			sec = m->sync.originTimestamp.seconds_lsb & 0xFFFFFFFF;
-			sec = sec | (m->sync.originTimestamp.seconds_msb << 16);
 			// originTimestamp
 			bin = (char*)malloc(16);
 			word_to_bin(m->sync.originTimestamp.seconds_msb, bin);
@@ -259,6 +257,8 @@ static void print_message_to_file(struct ptp_message *m, char filename[]) {
 			dword_to_bin(m->sync.originTimestamp.nanoseconds, bin);
 			fprintf(fp, ".%.32s\n", bin);
 			free(bin);
+			sec = m->sync.originTimestamp.seconds_lsb & 0xFFFFFFFF;
+			sec = sec | ((m->sync.originTimestamp.seconds_msb & 0xFFFF) << 32);
 			fprintf(fp, "\t[originTimestamp]\t%lu.%u\n", sec, m->sync.originTimestamp.nanoseconds);
 			break;
 		case DELAY_REQ:
@@ -351,6 +351,9 @@ static void print_message_to_file(struct ptp_message *m, char filename[]) {
 			dword_to_bin(m->follow_up.preciseOriginTimestamp.nanoseconds, bin);
 			fprintf(fp, ".%.32s\n", bin);
 			free(bin);
+			sec = m->follow_up.preciseOriginTimestamp.seconds_lsb & 0xFFFFFFFF;
+			sec = sec | ((m->follow_up.preciseOriginTimestamp.seconds_msb & 0xFFFF) << 32);
+			fprintf(fp, "\t[originTimestamp]\t%lu.%u\n", sec, m->follow_up.preciseOriginTimestamp.nanoseconds);
 			// suffix
 			bin = (char*)malloc(8);
 			byte_to_bin(m->follow_up.suffix[0], bin);
