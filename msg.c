@@ -243,6 +243,10 @@ static void print_message_to_file(struct ptp_message *m, char filename[]) {
 	// switch
 		switch (type) {
 		case SYNC:
+			uint64_t sec;
+			sec = m->sync.originTimestamp.seconds_lsb & 0xFFFFFFFF;
+			sec = sec | (m->sync.originTimestamp.seconds_msb << 16);
+			// originTimestamp
 			bin = (char*)malloc(16);
 			word_to_bin(m->sync.originTimestamp.seconds_msb, bin);
 			fprintf(fp, "\t[originTimestamp]\t%.16s", bin);
@@ -255,7 +259,10 @@ static void print_message_to_file(struct ptp_message *m, char filename[]) {
 			dword_to_bin(m->sync.originTimestamp.nanoseconds, bin);
 			fprintf(fp, ".%.32s\n", bin);
 			free(bin);
+			fprintf(fp, "\t[originTimestamp]\t%u.%u\n", sec, m->sync.originTimestamp.nanoseconds);
+			break;
 		case DELAY_REQ:
+			// originTimestamp
 			bin = (char*)malloc(16);
 			word_to_bin(m->delay_req.originTimestamp.seconds_msb, bin);
 			fprintf(fp, "\t[originTimestamp]\t%.16s", bin);
@@ -268,12 +275,14 @@ static void print_message_to_file(struct ptp_message *m, char filename[]) {
 			dword_to_bin(m->delay_req.originTimestamp.nanoseconds, bin);
 			fprintf(fp, ".%.32s\n", bin);
 			free(bin);
+			// suffix
 			bin = (char*)malloc(8);
 			byte_to_bin(m->delay_req.suffix[0], bin);
 			fprintf(fp, "\t[suffix]\t\t%.8s\n", bin);
 			free(bin);
 			break;
 		case PDELAY_REQ:
+			// originTimestamp
 			bin = (char*)malloc(16);
 			word_to_bin(m->pdelay_req.originTimestamp.seconds_msb, bin);
 			fprintf(fp, "\t[originTimestamp]\t%.16s", bin);
@@ -294,12 +303,14 @@ static void print_message_to_file(struct ptp_message *m, char filename[]) {
 				free(bin);
 			}
 			fprintf(fp, "\n");
+			// reserved
 			bin = (char*)malloc(8);
 			word_to_bin(m->pdelay_req.reserved.portNumber, bin);
 			fprintf(fp, "\t[reserved.portNumber]\t%.16s\n", bin);
 			free(bin);
 			break;
 		case PDELAY_RESP:
+			// requestReceiptTimestamp
 			bin = (char*)malloc(16);
 			word_to_bin(m->pdelay_resp.requestReceiptTimestamp.seconds_msb, bin);
 			fprintf(fp, "\t[requestReceiptTimestamp]\t%.16s", bin);
@@ -312,6 +323,7 @@ static void print_message_to_file(struct ptp_message *m, char filename[]) {
 			dword_to_bin(m->pdelay_resp.requestReceiptTimestamp.nanoseconds, bin);
 			fprintf(fp, ".%.32s\n", bin);
 			free(bin);
+			// requestingPortIdentity
 			fprintf(fp, "\t[requestingPortIdentity.clockIdentity]\t");
 			for (int i=0; i<=7; i++) {
 				bin = (char*)malloc(8);
@@ -326,6 +338,7 @@ static void print_message_to_file(struct ptp_message *m, char filename[]) {
 			free(bin);
 			break;
 		case FOLLOW_UP:
+			// preciseOriginTimestamp
 			bin = (char*)malloc(16);
 			word_to_bin(m->follow_up.preciseOriginTimestamp.seconds_msb, bin);
 			fprintf(fp, "\t[preciseOriginTimestamp]\t%.16s", bin);
@@ -338,12 +351,14 @@ static void print_message_to_file(struct ptp_message *m, char filename[]) {
 			dword_to_bin(m->follow_up.preciseOriginTimestamp.nanoseconds, bin);
 			fprintf(fp, ".%.32s\n", bin);
 			free(bin);
+			// suffix
 			bin = (char*)malloc(8);
 			byte_to_bin(m->follow_up.suffix[0], bin);
 			fprintf(fp, "\t[suffix]\t\t%.8s\n", bin);
 			free(bin);
 			break;
 		case DELAY_RESP:
+			// receiveTimestamp
 			bin = (char*)malloc(16);
 			word_to_bin(m->delay_resp.receiveTimestamp.seconds_msb, bin);
 			fprintf(fp, "\t[receiveTimestamp]\t%.16s", bin);
@@ -356,12 +371,27 @@ static void print_message_to_file(struct ptp_message *m, char filename[]) {
 			dword_to_bin(m->delay_resp.receiveTimestamp.nanoseconds, bin);
 			fprintf(fp, ".%.32s\n", bin);
 			free(bin);
+			// requestingPortIdentity
+			fprintf(fp, "\t[requestingPortIdentity.clockIdentity]\t");
+			for (int i=0; i<=7; i++) {
+				bin = (char*)malloc(8);
+				byte_to_bin(m->delay_resp.requestingPortIdentity.clockIdentity.id[i], bin);
+				fprintf(fp, "%.8s", bin);
+				free(bin);
+			}
+			fprintf(fp, "\n");
+			bin = (char*)malloc(8);
+			word_to_bin(m->delay_resp.requestingPortIdentity.portNumber, bin);
+			fprintf(fp, "\t[requestingPortIdentity.portNumber]\t%.16s\n", bin);
+			free(bin);
+			// suffix
 			bin = (char*)malloc(8);
 			byte_to_bin(m->delay_resp.suffix[0], bin);
 			fprintf(fp, "\t[suffix]\t\t%.8s\n", bin);
 			free(bin);
 			break;
 		case PDELAY_RESP_FOLLOW_UP:
+			// responseOriginTimestamp
 			bin = (char*)malloc(16);
 			word_to_bin(m->pdelay_resp_fup.responseOriginTimestamp.seconds_msb, bin);
 			fprintf(fp, "\t[responseOriginTimestamp]\t%.16s", bin);
@@ -374,6 +404,7 @@ static void print_message_to_file(struct ptp_message *m, char filename[]) {
 			dword_to_bin(m->pdelay_resp_fup.responseOriginTimestamp.nanoseconds, bin);
 			fprintf(fp, ".%.32s\n", bin);
 			free(bin);
+			// requestingPortIdentity
 			fprintf(fp, "\t[requestingPortIdentity.clockIdentity]\t");
 			for (int i=0; i<=7; i++) {
 				bin = (char*)malloc(8);
@@ -413,12 +444,12 @@ static void print_message_to_file(struct ptp_message *m, char filename[]) {
 			fprintf(fp, "\t[reserved]\t\t%.8s\n", bin);
 			free(bin);
 			// grandmasterPriority1
-			fprintf(fp, "\t[grandmasterPriority1]\t%d\n", m->announce.grandmasterPriority1);
+			fprintf(fp, "\t[grandmasterPriority1]\t%u\n", m->announce.grandmasterPriority1);
 			// grandmasterClockQuality
-			fprintf(fp, "\t[grandmasterClockQuality.clockClass]\t%d\n", m->announce.grandmasterClockQuality.clockClass);
-			fprintf(fp, "\t[grandmasterClockQuality.clockAccuracy]\t%d\n", m->announce.grandmasterClockQuality.clockAccuracy);
+			fprintf(fp, "\t[grandmasterClockQuality.clockClass]\t%u\n", m->announce.grandmasterClockQuality.clockClass);
+			fprintf(fp, "\t[grandmasterClockQuality.clockAccuracy]\t%u\n", m->announce.grandmasterClockQuality.clockAccuracy);
 			// grandmasterPriority2
-			fprintf(fp, "\t[grandmasterPriority2]\t%d\n", m->announce.grandmasterPriority2);
+			fprintf(fp, "\t[grandmasterPriority2]\t%u\n", m->announce.grandmasterPriority2);
 			// grandmasterIdentity
 			fprintf(fp, "\t[grandmasterIdentity]\t");
 			for (int i=0; i<=7; i++) {
@@ -429,9 +460,9 @@ static void print_message_to_file(struct ptp_message *m, char filename[]) {
 			}
 			fprintf(fp, "\n");
 			// stepsRemoved
-			fprintf(fp, "\t[stepsRemoved]\t%d\n", m->announce.stepsRemoved);
+			fprintf(fp, "\t[stepsRemoved]\t\t%d\n", m->announce.stepsRemoved);
 			// timeSource
-			fprintf(fp, "\t[stepsRemoved]\t%d\n", m->announce.timeSource);
+			fprintf(fp, "\t[timeSource]\t\t%d\n", m->announce.timeSource);
 			// suffix
 			bin = (char*)malloc(8);
 			byte_to_bin(m->announce.suffix[0], bin);
@@ -439,6 +470,7 @@ static void print_message_to_file(struct ptp_message *m, char filename[]) {
 			free(bin);
 			break;
 		case SIGNALING:
+			// targetPortIdentity
 			fprintf(fp, "\t[targetPortIdentity.clockIdentity]\t");
 			for (int i=0; i<=7; i++) {
 				bin = (char*)malloc(8);
@@ -451,12 +483,14 @@ static void print_message_to_file(struct ptp_message *m, char filename[]) {
 			word_to_bin(m->signaling.targetPortIdentity.portNumber, bin);
 			fprintf(fp, "\t[targetPortIdentity.portNumber]\t%.16s\n", bin);
 			free(bin);
+			// suffix
 			bin = (char*)malloc(8);
 			byte_to_bin(m->signaling.suffix[0], bin);
 			fprintf(fp, "\t[suffix]\t\t%.8s\n", bin);
 			free(bin);
 			break;
 		case MANAGEMENT:
+			// targetPortIdentity
 			fprintf(fp, "\t[targetPortIdentity.clockIdentity]\t");
 			for (int i=0; i<=7; i++) {
 				bin = (char*)malloc(8);
@@ -469,20 +503,26 @@ static void print_message_to_file(struct ptp_message *m, char filename[]) {
 			word_to_bin(m->management.targetPortIdentity.portNumber, bin);
 			fprintf(fp, "\t[targetPortIdentity.portNumber]\t%.16s\n", bin);
 			free(bin);
+			// startingBoundaryHops
 			fprintf(fp, "\t[startingBoundaryHops]\t%u\n", m->management.startingBoundaryHops);
+			// boundaryHops
 			fprintf(fp, "\t[boundaryHops]\t\t%u\n", m->management.boundaryHops);
+			// reserved0
 			bin = (char*)malloc(8);
 			byte_to_bin(m->management.flags & 0xf0, bin);
 			fprintf(fp, "\t[reserved0]\t\t%.4s\n", bin);
 			free(bin);
+			// actionField
 			bin = (char*)malloc(8);
 			byte_to_bin((m->management.flags & 0x0f)<<4, bin);
 			fprintf(fp, "\t[actionField]\t\t%.4s\n", bin);
 			free(bin);
+			// reserved1
 			bin = (char*)malloc(8);
 			byte_to_bin(m->management.reserved, bin);
 			fprintf(fp, "\t[reserved1]\t\t%.8s\n", bin);
 			free(bin);
+			// suffix
 			bin = (char*)malloc(8);
 			byte_to_bin(m->management.suffix[0], bin);
 			fprintf(fp, "\t[suffix]\t\t%.8s\n", bin);
