@@ -211,7 +211,6 @@ int main(int argc, char *argv[])
 			break;
 
 		// s - enable slaveOnly mode
-		// TODO: what does this mean?
 		case 's':
 			if (config_set_int(cfg, "slaveOnly", 1)) {
 				goto out;
