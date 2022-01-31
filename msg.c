@@ -671,8 +671,6 @@ static void log_message(struct ptp_header *m)
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////// uses ptp_header
 static int hdr_post_recv(struct ptp_header *m)
 {
-	// DEBUG
-	// fprintf(stderr, "[DEBUG]\tmsg.c\thdr_post_recv\n");
 
 	// convert byte order
 	if ((m->ver & VERSION_MASK) != VERSION)
@@ -686,7 +684,7 @@ static int hdr_post_recv(struct ptp_header *m)
 	// print_headers_to_terminal(m, "POST-RECEIVE");
 
 	// print header fields to file
-	print_headers_to_file(m, "post-receive.txt");
+	// print_headers_to_file(m, "post-receive.txt");
 
 	// return
 	return 0;
@@ -700,25 +698,25 @@ static int hdr_pre_send(struct ptp_header *m)
 	// fprintf(stderr, "[DEBUG]\tmsg.c\thdr_pre_send\n");
 
 	// modify header values
-	// reserved (nibble)
-		m->ver = m->ver | 0xf0;
-	// reserved1 (byte)
-		m->reserved1 = 0xff;
-	// flagField[0] (byte)
-		m->flagField[0] = m->flagField[0] | 0xf8;
-	// flagField[1] (byte)
-		m->flagField[1] = m->flagField[1] | 0x80;
-	// reserved2 (dword)
-		m->reserved2 = 0xffffffff;
-	// control (byte)
-		m->control = 0xff;
+	// // reserved (nibble)
+	// 	m->ver = m->ver | 0xf0;
+	// // reserved1 (byte)
+	// 	m->reserved1 = 0xff;
+	// // flagField[0] (byte)
+	// 	m->flagField[0] = m->flagField[0] | 0xf8;
+	// // flagField[1] (byte)
+	// 	m->flagField[1] = m->flagField[1] | 0x80;
+	// // reserved2 (dword)
+	// 	m->reserved2 = 0xffffffff;
+	// // control (byte)
+	// 	m->control = 0xff;
 
 
 	// print header fields to terminal
 	// print_headers_to_terminal(m, "PRE-SEND");
 
 	// print header fields to file
-	print_headers_to_file(m, "pre-send.txt");
+	// print_headers_to_file(m, "pre-send.txt");
 
 	// convert byte order
 	m->messageLength = htons(m->messageLength);  // converts UInteger16 messageLength from host CPU byte order to network byte order
@@ -727,7 +725,7 @@ static int hdr_pre_send(struct ptp_header *m)
 	m->sequenceId = htons(m->sequenceId);  // converts UInteger16 sequenceId from from host CPU byte order to network byte order
 	
 	// log message
-	log_message(m);
+	// log_message(m);
 
 	// return
 	return 0;
@@ -1068,7 +1066,7 @@ int msg_post_recv(struct ptp_message *m, int cnt)
 		return err;
 
 	// print message to file
-	print_message_to_file(m, "post-receive.txt");
+	// print_message_to_file(m, "post-receive.txt");
 
 	return 0;
 }
@@ -1124,7 +1122,7 @@ int msg_pre_send(struct ptp_message *m)
 	suffix_pre_send(m);
 
 	// print message to file
-	print_message_to_file(m, "pre-send.txt");
+	// print_message_to_file(m, "pre-send.txt");
 
 	return 0;
 }
