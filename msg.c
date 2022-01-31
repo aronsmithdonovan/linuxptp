@@ -227,7 +227,6 @@ static void print_message_to_file(struct ptp_message *m, char filename[]) {
 	// initialize
 		char* bin;
 		unsigned long sec;
-		unsigned int size;
 
 	// file initialization
 		FILE *fp;
@@ -242,7 +241,6 @@ static void print_message_to_file(struct ptp_message *m, char filename[]) {
 	// switch
 		switch (type) {
 		case SYNC:
-			size = 0;
 			// originTimestamp
 			sec = (unsigned long) m->sync.originTimestamp.seconds_lsb & 0xFFFFFFFF;
 			sec = sec | (((unsigned long) m->sync.originTimestamp.seconds_msb & 0xFFFF) << 32);
@@ -261,7 +259,6 @@ static void print_message_to_file(struct ptp_message *m, char filename[]) {
 				// free(bin);
 			break;
 		case DELAY_REQ:
-			size = sizeof m->delay_req.suffix / sizeof m->delay_req.suffix[0];
 			// originTimestamp
 			sec = (unsigned long) m->delay_req.originTimestamp.seconds_lsb & 0xFFFFFFFF;
 			sec = sec | (((unsigned long) m->delay_req.originTimestamp.seconds_msb & 0xFFFF) << 32);
@@ -285,7 +282,6 @@ static void print_message_to_file(struct ptp_message *m, char filename[]) {
 			free(bin);
 			break;
 		case PDELAY_REQ:
-			size = 0;
 			// originTimestamp
 			sec = (unsigned long) m->pdelay_req.originTimestamp.seconds_lsb & 0xFFFFFFFF;
 			sec = sec | (((unsigned long) m->pdelay_req.originTimestamp.seconds_msb & 0xFFFF) << 32);
@@ -318,7 +314,6 @@ static void print_message_to_file(struct ptp_message *m, char filename[]) {
 			free(bin);
 			break;
 		case PDELAY_RESP:
-			size = 0;
 			// requestReceiptTimestamp
 			sec = (unsigned long) m->pdelay_resp.requestReceiptTimestamp.seconds_lsb & 0xFFFFFFFF;
 			sec = sec | (((unsigned long) m->pdelay_resp.requestReceiptTimestamp.seconds_msb & 0xFFFF) << 32);
@@ -350,7 +345,6 @@ static void print_message_to_file(struct ptp_message *m, char filename[]) {
 			free(bin);
 			break;
 		case FOLLOW_UP:
-			size = sizeof m->follow_up.suffix / sizeof m->follow_up.suffix[0];
 			// preciseOriginTimestamp
 			sec = (unsigned long) m->follow_up.preciseOriginTimestamp.seconds_lsb & 0xFFFFFFFF;
 			sec = sec | (((unsigned long) m->follow_up.preciseOriginTimestamp.seconds_msb & 0xFFFF) << 32);
@@ -374,7 +368,6 @@ static void print_message_to_file(struct ptp_message *m, char filename[]) {
 			free(bin);
 			break;
 		case DELAY_RESP:
-			size = sizeof m->delay_resp.suffix / sizeof m->delay_resp.suffix[0];
 			// receiveTimestamp
 			sec = (unsigned long) m->delay_resp.receiveTimestamp.seconds_lsb & 0xFFFFFFFF;
 			sec = sec | (((unsigned long) m->delay_resp.receiveTimestamp.seconds_msb & 0xFFFF) << 32);
@@ -411,7 +404,6 @@ static void print_message_to_file(struct ptp_message *m, char filename[]) {
 			free(bin);
 			break;
 		case PDELAY_RESP_FOLLOW_UP:
-			size = 0;
 			// responseOriginTimestamp
 			sec = (unsigned long) m->pdelay_resp_fup.responseOriginTimestamp.seconds_lsb & 0xFFFFFFFF;
 			sec = sec | (((unsigned long) m->pdelay_resp_fup.responseOriginTimestamp.seconds_msb & 0xFFFF) << 32);
@@ -447,7 +439,6 @@ static void print_message_to_file(struct ptp_message *m, char filename[]) {
 			free(bin);
 			break;
 		case ANNOUNCE:
-			size = sizeof m->announce.suffix / sizeof m->announce.suffix[0];
 			// originTimestamp
 			sec = (unsigned long) m->announce.originTimestamp.seconds_lsb & 0xFFFFFFFF;
 			sec = sec | (((unsigned long) m->announce.originTimestamp.seconds_msb & 0xFFFF) << 32);
@@ -498,7 +489,6 @@ static void print_message_to_file(struct ptp_message *m, char filename[]) {
 			free(bin);
 			break;
 		case SIGNALING:
-			size = sizeof m->signaling.suffix / sizeof m->signaling.suffix[0];
 			// targetPortIdentity
 			fprintf(fp, "\t[targetPortIdentity.clockIdentity]\t");
 			for (int i=0; i<=7; i++) {
@@ -519,7 +509,6 @@ static void print_message_to_file(struct ptp_message *m, char filename[]) {
 			free(bin);
 			break;
 		case MANAGEMENT:
-			size = sizeof m->management.suffix / sizeof m->management.suffix[0];
 			// targetPortIdentity
 			fprintf(fp, "\t[targetPortIdentity.clockIdentity]\t");
 			for (int i=0; i<=7; i++) {
@@ -561,9 +550,6 @@ static void print_message_to_file(struct ptp_message *m, char filename[]) {
 		default:
 			break;
 		}
-
-	// print size of suffix to terminal
-		printf("\n%s suffix size:\t%u\n", msg_type_string(type), size);
 
 	// dividing line
 		fprintf(fp, "\n===============================================================\n\n");
