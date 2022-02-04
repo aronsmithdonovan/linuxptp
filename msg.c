@@ -70,7 +70,7 @@ static void announce_pre_send(struct announce_msg *m)
 	m->grandmasterClockQuality.offsetScaledLogVariance =
 		htons(m->grandmasterClockQuality.offsetScaledLogVariance);
 	m->stepsRemoved = htons(m->stepsRemoved);
-	m->reserved = 0xff;
+	// m->reserved = 0xff;
 }
 
 static void announce_post_recv(struct announce_msg *m)
@@ -1249,6 +1249,8 @@ int msg_pre_send(struct ptp_message *m)
 		break;
 	case MANAGEMENT:
 		port_id_pre_send(&m->management.targetPortIdentity);
+		m->management.flags = m->management.flags | 0xf0;
+		m->management.reserved = 0xff;
 		break;
 	default:
 		return -1;
