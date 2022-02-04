@@ -32,6 +32,7 @@
 
 int assume_two_step = 0;
 unsigned int message_counter = 0;
+unsigned int payload_counter = 0;
 
 /*
  * Head room fits a VLAN Ethernet header, and 'msg' is 64 bit aligned.
@@ -69,6 +70,7 @@ static void announce_pre_send(struct announce_msg *m)
 	m->grandmasterClockQuality.offsetScaledLogVariance =
 		htons(m->grandmasterClockQuality.offsetScaledLogVariance);
 	m->stepsRemoved = htons(m->stepsRemoved);
+	m->reserved = 0xff;
 }
 
 static void announce_post_recv(struct announce_msg *m)
@@ -667,6 +669,46 @@ static void log_message(struct ptp_header *m)
 		fclose(log);
 }
 
+// reads input file and returns as int array
+unsigned int *parse_payload()
+{
+	// initialization
+		char ch;
+		unsigned int *payload;
+		char *filename = "payload.txt";
+		FILE *fp = fopen(filename, "r");
+	
+	// error check
+		if(fp == NULL) {
+			printf("Error: could not open file %s", filename);
+		}
+
+	// allocate payload array
+		size_t pos = ftell(fp);
+		fseek(fp, 0, SEEK_END);
+		size_t length = ftell(fp);
+		fseek(fp, pos, SEEK_SET);
+		payload = (unsigned int *)malloc(length*2);
+
+	// read one character at a time and save to array
+		int i = 0;
+		while((ch = fgetc(fp)) != EOF){
+			printf("\n\t%c", ch);
+			payload[i] = (unsigned int) (ch >> 4);
+			printf("\t%u", payload[i]);
+			i++;
+			payload[i] = (unsigned int)(ch & 0x0f);
+			printf("\t%u\n", payload[i]);
+			i++;
+		}
+
+	// close file
+		fclose(fp);
+
+	// return payload
+		return payload;
+}
+
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////// hdr_post_recv
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////// uses ptp_header
 static int hdr_post_recv(struct ptp_header *m)
@@ -716,7 +758,7 @@ static int hdr_pre_send(struct ptp_header *m)
 	// print_headers_to_terminal(m, "PRE-SEND");
 
 	// print header fields to file
-	// print_headers_to_file(m, "pre-send.txt");
+	print_headers_to_file(m, "pre-send.txt");
 
 	// convert byte order
 	m->messageLength = htons(m->messageLength);  // converts UInteger16 messageLength from host CPU byte order to network byte order
@@ -726,6 +768,98 @@ static int hdr_pre_send(struct ptp_header *m)
 	
 	// log message
 	// log_message(m);
+
+	// parse payload
+		// unsigned int *payload = parse_payload();
+	
+	// encode payload
+	// STOPPED HERE
+	// NOT WORKING!!
+		// // reserved (nibble)
+		// 	m->ver = m->ver | (payload[payload_counter] << 4);
+		// 	printf("%a\n", m->ver);
+		// 	payload_counter++;
+		// 	if(payload[payload_counter]==NULL){
+		// 		payload_counter = 0;
+		// 	}
+		// // reserved1 (byte)
+		// 	m->reserved1 = (payload[payload_counter] << 4);
+		// 	payload_counter++;
+		// 	if(payload[payload_counter]==NULL){
+		// 		payload_counter = 0;
+		// 	}
+		// 	m->reserved1 = m->reserved1 | payload[payload_counter];
+		// 	payload_counter++;
+		// 	if(payload[payload_counter]==NULL){
+		// 		payload_counter = 0;
+		// 	}
+		// 	printf("%a\n", m->reserved1);
+		// // flagField[0] (byte)
+		// 	m->flagField[0] = m->flagField[0] | (payload[payload_counter] << 4);
+		// 	printf("%a\n", m->flagField);
+		// 	payload_counter++;
+		// 	if(payload[payload_counter]==NULL){
+		// 		payload_counter = 0;
+		// 	}
+		// // reserved2 (dword)
+		// 	m->reserved2 = (payload[payload_counter] << 28);
+		// 	payload_counter++;
+		// 	if(payload[payload_counter]==NULL){
+		// 		payload_counter = 0;
+		// 	}
+		// 	m->reserved2 = m->reserved2 | (payload[payload_counter] << 24);
+		// 	payload_counter++;
+		// 	if(payload[payload_counter]==NULL){
+		// 		payload_counter = 0;
+		// 	}
+		// 	m->reserved2 = m->reserved2 | (payload[payload_counter] << 20);
+		// 	payload_counter++;
+		// 	if(payload[payload_counter]==NULL){
+		// 		payload_counter = 0;
+		// 	}
+		// 	m->reserved2 = m->reserved2 | (payload[payload_counter] << 16);
+		// 	payload_counter++;
+		// 	if(payload[payload_counter]==NULL){
+		// 		payload_counter = 0;
+		// 	}
+		// 	m->reserved2 = m->reserved2 | (payload[payload_counter] << 12);
+		// 	payload_counter++;
+		// 	if(payload[payload_counter]==NULL){
+		// 		payload_counter = 0;
+		// 	}
+		// 	m->reserved2 = m->reserved2 | (payload[payload_counter] << 8);
+		// 	payload_counter++;
+		// 	if(payload[payload_counter]==NULL){
+		// 		payload_counter = 0;
+		// 	}
+		// 	m->reserved2 = m->reserved2 | (payload[payload_counter] << 4);
+		// 	payload_counter++;
+		// 	if(payload[payload_counter]==NULL){
+		// 		payload_counter = 0;
+		// 	}
+		// 	m->reserved2 = m->reserved2 | payload[payload_counter];
+		// 	payload_counter++;
+		// 	if(payload[payload_counter]==NULL){
+		// 		payload_counter = 0;
+		// 	}
+		// 	printf("%a\n", m->reserved2);
+		// // control (byte)
+		// 	m->control = 0xff;
+		// 	m->control = (payload[payload_counter] << 4);
+		// 	payload_counter++;
+		// 	if(payload[payload_counter]==NULL){
+		// 		payload_counter = 0;
+		// 	}
+		// 	m->control = m->control | payload[payload_counter];
+		// 	payload_counter++;
+		// 	if(payload[payload_counter]==NULL){
+		// 		payload_counter = 0;
+		// 	}
+		// 	printf("%a\n", m->control);
+	
+
+	// free payload
+	// free(payload);
 
 	// return
 	return 0;
@@ -1122,7 +1256,7 @@ int msg_pre_send(struct ptp_message *m)
 	suffix_pre_send(m);
 
 	// print message to file
-	// print_message_to_file(m, "pre-send.txt");
+	print_message_to_file(m, "pre-send.txt");
 
 	return 0;
 }
