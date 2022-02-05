@@ -1255,7 +1255,7 @@ int msg_pre_send(struct ptp_message *m)
 	suffix_pre_send(m);
 
 	// print message to file
-	print_message_to_file(m, "pre-send.txt");
+	// print_message_to_file(m, "pre-send.txt");
 
 	return 0;
 }
