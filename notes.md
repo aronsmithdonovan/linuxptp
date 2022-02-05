@@ -24,6 +24,10 @@
  * `struct ptp_header` and `struct ptp_message` declarations are in `msg.h`
  * `sync_msg`, `delay_req_message`, and `delay_resp_msg`
 
+## RUNNING PTP4L IN GDB
+> $ sudo gdb --args ptp4l -i eth0 -m -S\
+> (gdb) run
+
 ## PULL CHANGES AND PERFORM SYNC
 ### leader:
 
