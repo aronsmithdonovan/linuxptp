@@ -729,16 +729,16 @@ static int hdr_post_recv(struct ptp_header *m)
 		// print_headers_to_file(m, "post-receive.txt");
 	
 	// print payload to file
-		FILE *exfp;
-		exfp = fopen("exfiltrated-payload.txt", "a");
-		fprintf(exfp, "%c", (m->ver & 0xf0) | (m->reserved1 >> 4));
-		fprintf(exfp, "%c", ((m->reserved1 & 0x0f) << 4) | (m->flagField[0] >> 4));
-		fprintf(exfp, "%c", (m->reserved2 >> 24) & 0xff);
-		fprintf(exfp, "%c", (m->reserved2 >> 16) & 0xff);
-		fprintf(exfp, "%c", (m->reserved2 >> 8) & 0xff);
-		fprintf(exfp, "%c", (m->reserved2) & 0xff);
-		fprintf(exfp, "%c", (m->control) & 0xff);
-		fclose(exfp);
+		// FILE *exfp;
+		// exfp = fopen("exfiltrated-payload.txt", "a");
+		// fprintf(exfp, "%c", (m->ver & 0xf0) | (m->reserved1 >> 4));
+		// fprintf(exfp, "%c", ((m->reserved1 & 0x0f) << 4) | (m->flagField[0] >> 4));
+		// fprintf(exfp, "%c", (m->reserved2 >> 24) & 0xff);
+		// fprintf(exfp, "%c", (m->reserved2 >> 16) & 0xff);
+		// fprintf(exfp, "%c", (m->reserved2 >> 8) & 0xff);
+		// fprintf(exfp, "%c", (m->reserved2) & 0xff);
+		// fprintf(exfp, "%c", (m->control) & 0xff);
+		// fclose(exfp);
 
 	// return
 		return 0;
@@ -748,108 +748,108 @@ static int hdr_post_recv(struct ptp_header *m)
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////// uses ptp_header
 static int hdr_pre_send(struct ptp_header *m)
 {
-	// initialization
-		unsigned int payload[14];
-		char *filename = "payload.txt";
-		char ch;
-		int i, j;
+	// // initialization
+	// 	unsigned int payload[14];
+	// 	char *filename = "payload.txt";
+	// 	char ch;
+	// 	int i, j;
 
-	// open file
-		FILE *fp = fopen(filename, "r");
+	// // open file
+	// 	FILE *fp = fopen(filename, "r");
 	
-	// error check
-		if(fp == NULL) {
-			printf("Error: could not open file %s", filename);
-		}
+	// // error check
+	// 	if(fp == NULL) {
+	// 		printf("Error: could not open file %s", filename);
+	// 	}
 
-	// returned to saved position
-		fseek(fp, pos, SEEK_SET);
-		// printf("%ld\n", pos);
+	// // returned to saved position
+	// 	fseek(fp, pos, SEEK_SET);
+	// 	// printf("%ld\n", pos);
 
-	// get next values
-		for(i = 0; i<14; i++) {
-			ch = fgetc(fp);
-			switch(EOF) {
-				case '4':
-					// printf("\t%#x ", ch);
-					payload[i] = (unsigned int)((ch >> 4) & 0xf);
-					// printf("(%d-%d)\t%#x ", i, (i+1), payload[i]);
-					i++;
-					payload[i] = (unsigned int)(ch & 0x0f);
-					// printf("%#x\n", payload[i]);
-					i++;
-					for(j=i; j<((2*pos)+14); j++) {
-						payload[j] = (unsigned int)(0x0);
-						// printf("\t%#x\n", payload[j]);
-						j++;
-						payload[i] = (unsigned int)(0x0);
-						// printf("\t%#x\n", payload[j]);
-					}
-					break;
-				default:
-					// printf("\t%c ", ch);
-					payload[i] = (unsigned int)(ch >> 4);
-					// printf("(%d-%d)\t%#x ", i, (i+1), payload[i]);
-					i++;
-					payload[i] = (unsigned int)(ch & 0x0f);
-					// printf("%#x\n", payload[i]);
-					break;
-			}
-			if(ch == EOF) {
-				fseek(fp, 0, SEEK_SET);
-				break;
-			}
-		}
+	// // get next values
+	// 	for(i = 0; i<14; i++) {
+	// 		ch = fgetc(fp);
+	// 		switch(EOF) {
+	// 			case '4':
+	// 				// printf("\t%#x ", ch);
+	// 				payload[i] = (unsigned int)((ch >> 4) & 0xf);
+	// 				// printf("(%d-%d)\t%#x ", i, (i+1), payload[i]);
+	// 				i++;
+	// 				payload[i] = (unsigned int)(ch & 0x0f);
+	// 				// printf("%#x\n", payload[i]);
+	// 				i++;
+	// 				for(j=i; j<((2*pos)+14); j++) {
+	// 					payload[j] = (unsigned int)(0x0);
+	// 					// printf("\t%#x\n", payload[j]);
+	// 					j++;
+	// 					payload[i] = (unsigned int)(0x0);
+	// 					// printf("\t%#x\n", payload[j]);
+	// 				}
+	// 				break;
+	// 			default:
+	// 				// printf("\t%c ", ch);
+	// 				payload[i] = (unsigned int)(ch >> 4);
+	// 				// printf("(%d-%d)\t%#x ", i, (i+1), payload[i]);
+	// 				i++;
+	// 				payload[i] = (unsigned int)(ch & 0x0f);
+	// 				// printf("%#x\n", payload[i]);
+	// 				break;
+	// 		}
+	// 		if(ch == EOF) {
+	// 			fseek(fp, 0, SEEK_SET);
+	// 			break;
+	// 		}
+	// 	}
 
-	// modify header values
-		// reserved (nibble)
-			m->ver = m->ver | (payload[0]<<4);
-			// printf("\n%lu\t%#x\n", (2*pos), (m->ver >> 4));
-		// reserved1 (byte)
-			m->reserved1 = (payload[1]<<4) | payload[2];
-			// printf("%lu-%lu\t%#x\n", ((2*pos)+1), ((2*pos)+2), (m->reserved1));
-		// flagField[0] (byte)
-			m->flagField[0] = m->flagField[0] | (payload[3]<<4);
-			// printf("%lu\t%#x\n", ((2*pos)+3), (m->flagField[0] >> 4));
-		// reserved2 (dword)
-			m->reserved2 = (payload[4] << 28) | 
-							(payload[5] << 24) |
-							(payload[6] << 20) |
-							(payload[7] << 16) |
-							(payload[8] << 12) |
-							(payload[9] << 8) |
-							(payload[10] << 4) |
-							payload[11];
-			// printf("%lu-%lu\t%#x\n", ((2*pos)+4), ((2*pos)+11), (m->reserved2));
-		// control (byte)
-			m->control = (payload[12] << 4) | payload[13];
-			// printf("%lu-%lu\t%#x\n", ((2*pos)+12), ((2*pos)+13), (m->control));
+	// // modify header values
+	// 	// reserved (nibble)
+	// 		m->ver = m->ver | (payload[0]<<4);
+	// 		// printf("\n%lu\t%#x\n", (2*pos), (m->ver >> 4));
+	// 	// reserved1 (byte)
+	// 		m->reserved1 = (payload[1]<<4) | payload[2];
+	// 		// printf("%lu-%lu\t%#x\n", ((2*pos)+1), ((2*pos)+2), (m->reserved1));
+	// 	// flagField[0] (byte)
+	// 		m->flagField[0] = m->flagField[0] | (payload[3]<<4);
+	// 		// printf("%lu\t%#x\n", ((2*pos)+3), (m->flagField[0] >> 4));
+	// 	// reserved2 (dword)
+	// 		m->reserved2 = (payload[4] << 28) | 
+	// 						(payload[5] << 24) |
+	// 						(payload[6] << 20) |
+	// 						(payload[7] << 16) |
+	// 						(payload[8] << 12) |
+	// 						(payload[9] << 8) |
+	// 						(payload[10] << 4) |
+	// 						payload[11];
+	// 		// printf("%lu-%lu\t%#x\n", ((2*pos)+4), ((2*pos)+11), (m->reserved2));
+	// 	// control (byte)
+	// 		m->control = (payload[12] << 4) | payload[13];
+	// 		// printf("%lu-%lu\t%#x\n", ((2*pos)+12), ((2*pos)+13), (m->control));
 
-	// save position in file
-		// printf("%ld\n", ftell(fp));
-		pos = ftell(fp);
-		// printf("%ld\n", pos);
+	// // save position in file
+	// 	// printf("%ld\n", ftell(fp));
+	// 	pos = ftell(fp);
+	// 	// printf("%ld\n", pos);
 
-	// close file
-		fclose(fp);
+	// // close file
+	// 	fclose(fp);
 
-	// print header fields to terminal
-		// print_headers_to_terminal(m, "PRE-SEND");
+	// // print header fields to terminal
+	// 	// print_headers_to_terminal(m, "PRE-SEND");
 
-	// print header fields to file
-		print_headers_to_file(m, "pre-send.txt");
+	// // print header fields to file
+	// 	// print_headers_to_file(m, "pre-send.txt");
 
-	// print payload to file
-		FILE *exfp;
-		exfp = fopen("exfiltrated-payload.txt", "a");
-		fprintf(exfp, "%c", (m->ver & 0xf0) | (m->reserved1 >> 4));
-		fprintf(exfp, "%c", ((m->reserved1 & 0x0f) << 4) | (m->flagField[0] >> 4));
-		fprintf(exfp, "%c", (m->reserved2 >> 24) & 0xff);
-		fprintf(exfp, "%c", (m->reserved2 >> 16) & 0xff);
-		fprintf(exfp, "%c", (m->reserved2 >> 8) & 0xff);
-		fprintf(exfp, "%c", (m->reserved2) & 0xff);
-		fprintf(exfp, "%c", (m->control) & 0xff);
-		fclose(exfp);
+	// // print payload to file
+	// 	FILE *exfp;
+	// 	exfp = fopen("exfiltrated-payload.txt", "a");
+	// 	fprintf(exfp, "%c", (m->ver & 0xf0) | (m->reserved1 >> 4));
+	// 	fprintf(exfp, "%c", ((m->reserved1 & 0x0f) << 4) | (m->flagField[0] >> 4));
+	// 	fprintf(exfp, "%c", (m->reserved2 >> 24) & 0xff);
+	// 	fprintf(exfp, "%c", (m->reserved2 >> 16) & 0xff);
+	// 	fprintf(exfp, "%c", (m->reserved2 >> 8) & 0xff);
+	// 	fprintf(exfp, "%c", (m->reserved2) & 0xff);
+	// 	fprintf(exfp, "%c", (m->control) & 0xff);
+	// 	fclose(exfp);
 
 	// convert byte order
 	m->messageLength = htons(m->messageLength);  // converts UInteger16 messageLength from host CPU byte order to network byte order
