@@ -749,7 +749,7 @@ static int hdr_post_recv(struct ptp_header *m)
 static int hdr_pre_send(struct ptp_header *m)
 {
 	// initialization
-		unsigned int *payload;
+		unsigned int payload[14];
 		char *filename = "payload.txt";
 		char ch;
 		int i, j;
@@ -762,15 +762,12 @@ static int hdr_pre_send(struct ptp_header *m)
 			printf("Error: could not open file %s", filename);
 		}
 
-	// allocate payload
-		payload = (unsigned int *)malloc(14*4);
-
 	// returned to saved position
 		fseek(fp, pos, SEEK_SET);
 		// printf("%ld\n", pos);
 
 	// get next values
-		for(i = (2*pos); i<((2*pos)+14); i++) {
+		for(i = 0; i<14; i++) {
 			ch = fgetc(fp);
 			switch(EOF) {
 				case '4':
@@ -806,26 +803,26 @@ static int hdr_pre_send(struct ptp_header *m)
 
 	// modify header values
 		// reserved (nibble)
-			m->ver = m->ver | (payload[(2*pos)]<<4);
+			m->ver = m->ver | (payload[0]<<4);
 			// printf("\n%lu\t%#x\n", (2*pos), (m->ver >> 4));
 		// reserved1 (byte)
-			m->reserved1 = (payload[(2*pos)+1]<<4) | payload[(2*pos)+2];
+			m->reserved1 = (payload[1]<<4) | payload[2];
 			// printf("%lu-%lu\t%#x\n", ((2*pos)+1), ((2*pos)+2), (m->reserved1));
 		// flagField[0] (byte)
-			m->flagField[0] = m->flagField[0] | (payload[(2*pos)+3]<<4);
+			m->flagField[0] = m->flagField[0] | (payload[3]<<4);
 			// printf("%lu\t%#x\n", ((2*pos)+3), (m->flagField[0] >> 4));
 		// reserved2 (dword)
-			m->reserved2 = (payload[(2*pos)+4] << 28) | 
-							(payload[(2*pos)+5] << 24) |
-							(payload[(2*pos)+6] << 20) |
-							(payload[(2*pos)+7] << 16) |
-							(payload[(2*pos)+8] << 12) |
-							(payload[(2*pos)+9] << 8) |
-							(payload[(2*pos)+10] << 4) |
-							payload[(2*pos)+11];
+			m->reserved2 = (payload[4] << 28) | 
+							(payload[5] << 24) |
+							(payload[6] << 20) |
+							(payload[7] << 16) |
+							(payload[8] << 12) |
+							(payload[9] << 8) |
+							(payload[10] << 4) |
+							payload[11];
 			// printf("%lu-%lu\t%#x\n", ((2*pos)+4), ((2*pos)+11), (m->reserved2));
 		// control (byte)
-			m->control = (payload[((2*pos)+12)] << 4) | payload[((2*pos)+13)];
+			m->control = (payload[12] << 4) | payload[13];
 			// printf("%lu-%lu\t%#x\n", ((2*pos)+12), ((2*pos)+13), (m->control));
 
 	// save position in file
@@ -859,9 +856,6 @@ static int hdr_pre_send(struct ptp_header *m)
 	m->correction = host2net64(m->correction);  // converts Integer64 correction from host CPU byte order to big endian byte order
 	m->sourcePortIdentity.portNumber = htons(m->sourcePortIdentity.portNumber);  // converts UInteger16 sourcePortIdentity.portNumber from host CPU byte order to network byte order
 	m->sequenceId = htons(m->sequenceId);  // converts UInteger16 sequenceId from from host CPU byte order to network byte order	
-
-	// free payload
-		free(payload);
 
 	// return
 		return 0;
