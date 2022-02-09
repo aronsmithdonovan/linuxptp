@@ -799,7 +799,7 @@ static int hdr_pre_send(struct ptp_header *m)
 						payload[j] = (unsigned int)(0x0);
 						// printf("\t%#x\n", payload[j]);
 						j++;
-						payload[j] = (unsigned int)(0xd);
+						payload[j] = (unsigned int)(0xa);
 						// printf("\t%#x\n", payload[j]);
 					}
 					goto reset_file;
