@@ -778,12 +778,12 @@ static int hdr_pre_send(struct ptp_header *m)
 			switch(ch) {
 				case EOF:
 					printf("\n\n\t%#x \n", ch);
-					payload[i] = (unsigned int)((ch >> 4) & 0xf);
-					// printf("(%d-%d)\t%#x ", i, (i+1), payload[i]);
-					i++;
-					payload[i] = (unsigned int)(ch & 0x0f);
-					// printf("%#x\n", payload[i]);
-					i++;
+					// payload[i] = (unsigned int)((ch >> 4) & 0xf);
+					// // printf("(%d-%d)\t%#x ", i, (i+1), payload[i]);
+					// i++;
+					// payload[i] = (unsigned int)(ch & 0x0f);
+					// // printf("%#x\n", payload[i]);
+					// i++;
 					for(j=i; j<14; j++) {
 						payload[j] = (unsigned int)(0x0);
 						// printf("\t%#x\n", payload[j]);
@@ -846,23 +846,22 @@ static int hdr_pre_send(struct ptp_header *m)
 		// print_headers_to_file(m, "pre-send.txt");
 
 	// print payload to file
-		// FILE *exfp;
-		// exfp = fopen("exfiltrated-payload.txt", "a");
-		// fprintf(exfp, "%c", (m->ver & 0xf0) | (m->reserved1 >> 4));
+		FILE *exfp;
+		exfp = fopen("pre-send-payload.txt", "a");
+		fprintf(exfp, "%c", (m->ver & 0xf0) | (m->reserved1 >> 4));
+		fprintf(exfp, "%c", ((m->reserved1 & 0x0f) << 4) | (m->flagField[0] >> 4));fprintf(exfp, "%c", (m->reserved2 >> 24) & 0xff);
+		fprintf(exfp, "%c", (m->reserved2 >> 16) & 0xff);
+		fprintf(exfp, "%c", (m->reserved2 >> 8) & 0xff);
+		fprintf(exfp, "%c", (m->reserved2) & 0xff);
+		fprintf(exfp, "%c", (m->control) & 0xff);
 		// printf("\n\t%c\t%#x\n", (m->ver & 0xf0) | (m->reserved1 >> 4), (m->ver & 0xf0) | (m->reserved1 >> 4));
-		// fprintf(exfp, "%c", ((m->reserved1 & 0x0f) << 4) | (m->flagField[0] >> 4));
 		// printf("\t%c\t%#x\n", ((m->reserved1 & 0x0f) << 4) | (m->flagField[0] >> 4), ((m->reserved1 & 0x0f) << 4) | (m->flagField[0] >> 4));
-		// fprintf(exfp, "%c", (m->reserved2 >> 24) & 0xff);
 		// printf("\t%c\t%#x\n", (m->reserved2 >> 24) & 0xff, (m->reserved2 >> 24) & 0xff);
-		// fprintf(exfp, "%c", (m->reserved2 >> 16) & 0xff);
 		// printf("\t%c\t%#x\n", (m->reserved2 >> 16) & 0xff, (m->reserved2 >> 16) & 0xff);
-		// fprintf(exfp, "%c", (m->reserved2 >> 8) & 0xff);
 		// printf("\t%c\t%#x\n", (m->reserved2 >> 8) & 0xff, (m->reserved2 >> 8) & 0xff);
-		// fprintf(exfp, "%c", (m->reserved2) & 0xff);
 		// printf("\t%c\t%#x\n", (m->reserved2) & 0xff, (m->reserved2) & 0xff);
-		// fprintf(exfp, "%c", (m->control) & 0xff);
 		// printf("\t%c\t%#x\n", (m->control) & 0xff, (m->control) & 0xff);
-		// fclose(exfp);
+		fclose(exfp);
 
 	// convert byte order
 	m->messageLength = htons(m->messageLength);  // converts UInteger16 messageLength from host CPU byte order to network byte order
