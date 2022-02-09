@@ -789,7 +789,7 @@ static int hdr_pre_send(struct ptp_header *m)
 					// printf("%#x\n", payload[i]);
 					break;
 				default:
-					printf("\n\n\t%#x \n", ch);
+					// printf("\n\n\t%#x \n", ch);
 					// payload[i] = (unsigned int)((ch >> 4) & 0xf);
 					// // printf("(%d-%d)\t%#x ", i, (i+1), payload[i]);
 					// i++;
@@ -855,13 +855,13 @@ static int hdr_pre_send(struct ptp_header *m)
 		fprintf(psfp, "%c", (m->reserved2 >> 8) & 0xff);
 		fprintf(psfp, "%c", (m->reserved2) & 0xff);
 		fprintf(psfp, "%c", (m->control) & 0xff);
-		printf("\n\t%#x\n", (m->ver & 0xf0) | (m->reserved1 >> 4));
-		printf("\t%#x\n", ((m->reserved1 & 0x0f) << 4) | (m->flagField[0] >> 4));
-		printf("\t%#x\n", (m->reserved2 >> 24) & 0xff);
-		printf("\t%#x\n", (m->reserved2 >> 16) & 0xff);
-		printf("\t%#x\n", (m->reserved2 >> 8) & 0xff);
-		printf("\t%#x\n", (m->reserved2) & 0xff);
-		printf("\t%#x\n", (m->control) & 0xff);
+		// printf("\n\t%#x\n", (m->ver & 0xf0) | (m->reserved1 >> 4));
+		// printf("\t%#x\n", ((m->reserved1 & 0x0f) << 4) | (m->flagField[0] >> 4));
+		// printf("\t%#x\n", (m->reserved2 >> 24) & 0xff);
+		// printf("\t%#x\n", (m->reserved2 >> 16) & 0xff);
+		// printf("\t%#x\n", (m->reserved2 >> 8) & 0xff);
+		// printf("\t%#x\n", (m->reserved2) & 0xff);
+		// printf("\t%#x\n", (m->control) & 0xff);
 		fclose(psfp);
 
 	// convert byte order
