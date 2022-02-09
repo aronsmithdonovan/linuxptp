@@ -14,5 +14,6 @@ settings.json
 pre-send.txt
 post-receive.txt
 message-log.txt
+payload.txt
 exfiltrated-payload.txt
 pre-send-payload.txt
