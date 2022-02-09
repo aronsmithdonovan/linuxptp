@@ -775,9 +775,9 @@ static int hdr_pre_send(struct ptp_header *m)
 	// get next values
 		for(i = 0; i<14; i++) {
 			ch = fgetc(fp);
-			switch(EOF) {
-				case '4':
-					printf("\t%#x ", ch);
+			switch(ch) {
+				case EOF:
+					printf("\n\n\t%#x \n", ch);
 					payload[i] = (unsigned int)((ch >> 4) & 0xf);
 					// printf("(%d-%d)\t%#x ", i, (i+1), payload[i]);
 					i++;
