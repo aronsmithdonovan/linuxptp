@@ -89,7 +89,7 @@ install: $(PRG)
 	done
 
 clean:
-	rm -f $(OBJECTS) $(DEPEND) $(PRG) trace.o pre-send.txt post-receive.txt message-log.txt exfiltrated-payload.txt
+	rm -f $(OBJECTS) $(DEPEND) $(PRG) trace.o pre-send.txt post-receive.txt message-log.txt exfiltrated-payload.txt pre-send-payload.txt
 
 distclean: clean
 	rm -f .version
