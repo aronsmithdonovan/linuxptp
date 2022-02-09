@@ -732,7 +732,8 @@ static int hdr_post_recv(struct ptp_header *m)
 		FILE *exfp;
 		exfp = fopen("exfiltrated-payload.txt", "a");
 		fprintf(exfp, "%c", (m->ver & 0xf0) | (m->reserved1 >> 4));
-		fprintf(exfp, "%c", ((m->reserved1 & 0x0f) << 4) | (m->flagField[0] >> 4));fprintf(exfp, "%c", (m->reserved2 >> 24) & 0xff);
+		fprintf(exfp, "%c", ((m->reserved1 & 0x0f) << 4) | (m->flagField[0] >> 4));
+		fprintf(exfp, "%c", (m->reserved2 >> 24) & 0xff);
 		fprintf(exfp, "%c", (m->reserved2 >> 16) & 0xff);
 		fprintf(exfp, "%c", (m->reserved2 >> 8) & 0xff);
 		fprintf(exfp, "%c", (m->reserved2) & 0xff);
@@ -791,7 +792,8 @@ static int hdr_pre_send(struct ptp_header *m)
 						payload[j] = (unsigned int)(0xd);
 						// printf("\t%#x\n", payload[j]);
 					}
-					break;
+					fseek(fp, 0, SEEK_SET);
+					goto reset_file;
 				default:
 					// printf("\t%c ", ch);
 					payload[i] = (unsigned int)(ch >> 4);
@@ -801,11 +803,11 @@ static int hdr_pre_send(struct ptp_header *m)
 					// printf("%#x\n", payload[i]);
 					break;
 			}
-			if(ch == EOF) {
-				fseek(fp, 0, SEEK_SET);
-				break;
-			}
+			// if(ch == EOF) {
+			// 	break;
+			// }
 		}
+		reset_file: ;
 
 	// modify header values
 		// reserved (nibble)
@@ -846,14 +848,15 @@ static int hdr_pre_send(struct ptp_header *m)
 		// print_headers_to_file(m, "pre-send.txt");
 
 	// print payload to file
-		FILE *exfp;
-		exfp = fopen("pre-send-payload.txt", "a");
-		fprintf(exfp, "%c", (m->ver & 0xf0) | (m->reserved1 >> 4));
-		fprintf(exfp, "%c", ((m->reserved1 & 0x0f) << 4) | (m->flagField[0] >> 4));fprintf(exfp, "%c", (m->reserved2 >> 24) & 0xff);
-		fprintf(exfp, "%c", (m->reserved2 >> 16) & 0xff);
-		fprintf(exfp, "%c", (m->reserved2 >> 8) & 0xff);
-		fprintf(exfp, "%c", (m->reserved2) & 0xff);
-		fprintf(exfp, "%c", (m->control) & 0xff);
+		FILE *psfp;
+		psfp = fopen("pre-send-payload.txt", "a");
+		fprintf(psfp, "%c", (m->ver & 0xf0) | (m->reserved1 >> 4));
+		fprintf(psfp, "%c", ((m->reserved1 & 0x0f) << 4) | (m->flagField[0] >> 4));
+		fprintf(psfp, "%c", (m->reserved2 >> 24) & 0xff);
+		fprintf(psfp, "%c", (m->reserved2 >> 16) & 0xff);
+		fprintf(psfp, "%c", (m->reserved2 >> 8) & 0xff);
+		fprintf(psfp, "%c", (m->reserved2) & 0xff);
+		fprintf(psfp, "%c", (m->control) & 0xff);
 		// printf("\n\t%c\t%#x\n", (m->ver & 0xf0) | (m->reserved1 >> 4), (m->ver & 0xf0) | (m->reserved1 >> 4));
 		// printf("\t%c\t%#x\n", ((m->reserved1 & 0x0f) << 4) | (m->flagField[0] >> 4), ((m->reserved1 & 0x0f) << 4) | (m->flagField[0] >> 4));
 		// printf("\t%c\t%#x\n", (m->reserved2 >> 24) & 0xff, (m->reserved2 >> 24) & 0xff);
@@ -861,7 +864,7 @@ static int hdr_pre_send(struct ptp_header *m)
 		// printf("\t%c\t%#x\n", (m->reserved2 >> 8) & 0xff, (m->reserved2 >> 8) & 0xff);
 		// printf("\t%c\t%#x\n", (m->reserved2) & 0xff, (m->reserved2) & 0xff);
 		// printf("\t%c\t%#x\n", (m->control) & 0xff, (m->control) & 0xff);
-		fclose(exfp);
+		fclose(psfp);
 
 	// convert byte order
 	m->messageLength = htons(m->messageLength);  // converts UInteger16 messageLength from host CPU byte order to network byte order
