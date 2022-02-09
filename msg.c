@@ -785,7 +785,7 @@ static int hdr_pre_send(struct ptp_header *m)
 					payload[i] = (unsigned int)(ch & 0x0f);
 					// printf("%#x\n", payload[i]);
 					i++;
-					for(j=i; j<((2*pos)+14); j++) {
+					for(j=i; j<14; j++) {
 						payload[j] = (unsigned int)(0x0);
 						// printf("\t%#x\n", payload[j]);
 						j++;
