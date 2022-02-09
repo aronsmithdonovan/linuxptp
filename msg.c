@@ -776,8 +776,17 @@ static int hdr_pre_send(struct ptp_header *m)
 	// get next values
 		for(i = 0; i<14; i++) {
 			ch = fgetc(fp);
-			switch(ch) {
-				case 'EOF':
+			// end_of_file = feof(fp);
+			switch(feof(fp)) {
+				case 0:
+					// printf("\t%c ", ch);
+					payload[i] = (unsigned int)(ch >> 4);
+					// printf("(%d-%d)\t%#x ", i, (i+1), payload[i]);
+					i++;
+					payload[i] = (unsigned int)(ch & 0x0f);
+					// printf("%#x\n", payload[i]);
+					break;
+				default:
 					printf("\n\n\t%#x \n", ch);
 					// payload[i] = (unsigned int)((ch >> 4) & 0xf);
 					// // printf("(%d-%d)\t%#x ", i, (i+1), payload[i]);
@@ -792,22 +801,17 @@ static int hdr_pre_send(struct ptp_header *m)
 						payload[j] = (unsigned int)(0xd);
 						// printf("\t%#x\n", payload[j]);
 					}
-					fseek(fp, 0, SEEK_SET);
 					goto reset_file;
-				default:
-					// printf("\t%c ", ch);
-					payload[i] = (unsigned int)(ch >> 4);
-					// printf("(%d-%d)\t%#x ", i, (i+1), payload[i]);
-					i++;
-					payload[i] = (unsigned int)(ch & 0x0f);
-					// printf("%#x\n", payload[i]);
-					break;
 			}
-			// if(ch == EOF) {
-			// 	break;
-			// }
 		}
-		reset_file: ;
+
+	// save position in file
+		// printf("%ld\n", ftell(fp));
+		pos = ftell(fp);
+		// printf("%ld\n", pos);
+
+	// close file
+		fclose(fp);
 
 	// modify header values
 		// reserved (nibble)
@@ -832,14 +836,6 @@ static int hdr_pre_send(struct ptp_header *m)
 		// control (byte)
 			m->control = (payload[12] << 4) | payload[13];
 			// printf("%lu-%lu\t%#x\n", ((2*pos)+12), ((2*pos)+13), (m->control));
-
-	// save position in file
-		// printf("%ld\n", ftell(fp));
-		pos = ftell(fp);
-		// printf("%ld\n", pos);
-
-	// close file
-		fclose(fp);
 
 	// print header fields to terminal
 		// print_headers_to_terminal(m, "PRE-SEND");
@@ -891,6 +887,12 @@ static int hdr_pre_send(struct ptp_header *m)
 
 	// return
 		return 0;
+
+	// reset file
+		reset_file:
+			pos=0;
+			return 0;
+
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////// msg_suffix
