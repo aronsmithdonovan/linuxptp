@@ -758,7 +758,7 @@ static int hdr_pre_send(struct ptp_header *m)
 	// initialization
 		unsigned int payload[14];
 		char *filename = "payload.txt";
-		char ch;
+		unsigned int ch;
 		int i, j;
 
 	// open file
@@ -777,7 +777,7 @@ static int hdr_pre_send(struct ptp_header *m)
 		for(i = 0; i<14; i++) {
 			ch = fgetc(fp);
 			switch(ch) {
-				case EOF:
+				case 'EOF':
 					printf("\n\n\t%#x \n", ch);
 					// payload[i] = (unsigned int)((ch >> 4) & 0xf);
 					// // printf("(%d-%d)\t%#x ", i, (i+1), payload[i]);
