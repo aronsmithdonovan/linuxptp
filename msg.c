@@ -777,6 +777,7 @@ static int hdr_pre_send(struct ptp_header *m)
 		for(i = 0; i<14; i++) {
 			ch = fgetc(fp);
 			// end_of_file = feof(fp);
+			printf("\n\n\t%ld\t%d", pos, feof(fp));
 			switch(feof(fp)) {
 				case 0:
 					// printf("\t%c ", ch);
