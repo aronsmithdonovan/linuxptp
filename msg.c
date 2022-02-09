@@ -848,6 +848,23 @@ static int hdr_pre_send(struct ptp_header *m)
 		// print_headers_to_file(m, "pre-send.txt");
 
 	// print payload to file
+		// FILE *psfp;
+		// psfp = fopen("pre-send-payload.txt", "a");
+		// fprintf(psfp, "%c", (m->ver & 0xf0) | (m->reserved1 >> 4));
+		// fprintf(psfp, "%c", ((m->reserved1 & 0x0f) << 4) | (m->flagField[0] >> 4));
+		// fprintf(psfp, "%c", (m->reserved2 >> 24) & 0xff);
+		// fprintf(psfp, "%c", (m->reserved2 >> 16) & 0xff);
+		// fprintf(psfp, "%c", (m->reserved2 >> 8) & 0xff);
+		// fprintf(psfp, "%c", (m->reserved2) & 0xff);
+		// fprintf(psfp, "%c", (m->control) & 0xff);
+		// // printf("\n\t%c\t%#x\n", (m->ver & 0xf0) | (m->reserved1 >> 4), (m->ver & 0xf0) | (m->reserved1 >> 4));
+		// // printf("\t%c\t%#x\n", ((m->reserved1 & 0x0f) << 4) | (m->flagField[0] >> 4), ((m->reserved1 & 0x0f) << 4) | (m->flagField[0] >> 4));
+		// // printf("\t%c\t%#x\n", (m->reserved2 >> 24) & 0xff, (m->reserved2 >> 24) & 0xff);
+		// // printf("\t%c\t%#x\n", (m->reserved2 >> 16) & 0xff, (m->reserved2 >> 16) & 0xff);
+		// // printf("\t%c\t%#x\n", (m->reserved2 >> 8) & 0xff, (m->reserved2 >> 8) & 0xff);
+		// // printf("\t%c\t%#x\n", (m->reserved2) & 0xff, (m->reserved2) & 0xff);
+		// // printf("\t%c\t%#x\n", (m->control) & 0xff, (m->control) & 0xff);
+		// fclose(psfp);
 		FILE *psfp;
 		psfp = fopen("pre-send-payload.txt", "a");
 		fprintf(psfp, "%c", (m->ver & 0xf0) | (m->reserved1 >> 4));
