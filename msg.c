@@ -82,7 +82,7 @@ static void announce_post_recv(struct announce_msg *m)
 }
 
 // converts an unsigned 8-bit int to its binary representation
-static void byte_to_bin(unsigned int n, char* bin)
+static inline void byte_to_bin(unsigned int n, char* bin)
 {
 	int c, k;
 	int i = 0;
@@ -95,7 +95,7 @@ static void byte_to_bin(unsigned int n, char* bin)
 } 
 
 // converts an unsigned 16-bit int to its binary representation
-static void word_to_bin(unsigned int n, char* bin)
+static inline void word_to_bin(unsigned int n, char* bin)
 {
 	int c, k;
 	int i = 0;
@@ -108,7 +108,7 @@ static void word_to_bin(unsigned int n, char* bin)
 } 
 
 // converts an unsigned 32-bit int to its binary representation
-static void dword_to_bin(unsigned int n, char* bin)
+static inline void dword_to_bin(unsigned int n, char* bin)
 {
 	int c, k;
 	int i = 0;
@@ -121,7 +121,7 @@ static void dword_to_bin(unsigned int n, char* bin)
 } 
 
 // prints header fields to a .txt file
-static void print_headers_to_file(struct ptp_header *m, char filename[])
+static inline void print_headers_to_file(struct ptp_header *m, char filename[])
 {
 	// initialize
 		char* bin;
@@ -224,7 +224,7 @@ static void print_headers_to_file(struct ptp_header *m, char filename[])
 }
 
 // print message contents (excl header) to file
-static void print_message_to_file(struct ptp_message *m, char filename[]) {
+static inline void print_message_to_file(struct ptp_message *m, char filename[]) {
 	
 	// initialize
 		char* bin;
@@ -562,7 +562,7 @@ static void print_message_to_file(struct ptp_message *m, char filename[]) {
 }
 
 // print header fields to terminal
-static void print_headers_to_terminal(struct ptp_header *m, char qualifier[])
+static inline void print_headers_to_terminal(struct ptp_header *m, char qualifier[])
 {
 	// initialize
 		char* bin;
@@ -653,7 +653,7 @@ static void print_headers_to_terminal(struct ptp_header *m, char qualifier[])
 }
 
 // logs message
-static void log_message(struct ptp_header *m)
+static inline void log_message(struct ptp_header *m)
 {
 	// initialization
 		FILE *log;
@@ -667,46 +667,6 @@ static void log_message(struct ptp_header *m)
 	// close file
 		message_counter++;
 		fclose(log);
-}
-
-// reads input file and returns as int array
-unsigned int *parse_payload()
-{
-	// initialization
-		char ch;
-		unsigned int *payload;
-		char *filename = "payload.txt";
-		FILE *fp = fopen(filename, "r");
-	
-	// error check
-		if(fp == NULL) {
-			printf("Error: could not open file %s", filename);
-		}
-
-	// allocate payload array
-		size_t pos = ftell(fp);
-		fseek(fp, 0, SEEK_END);
-		size_t length = ftell(fp);
-		fseek(fp, pos, SEEK_SET);
-		payload = (unsigned int *)malloc(length*2);
-
-	// read one character at a time and save to array
-		int i = 0;
-		while((ch = fgetc(fp)) != EOF){
-			printf("\n\t%c", ch);
-			payload[i] = (unsigned int) (ch >> 4);
-			printf("\t%u", payload[i]);
-			i++;
-			payload[i] = (unsigned int)(ch & 0x0f);
-			printf("\t%u\n", payload[i]);
-			i++;
-		}
-
-	// close file
-		fclose(fp);
-
-	// return payload
-		return payload;
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////// hdr_post_recv
